@@ -187,7 +187,7 @@ public class Square {
         while(x1<= x2){
         	
         	if(negate && !flip)
-        		pixelWriter.setColor((int) -(x1-back.getX()), (int) (y1-back.getY()), c);
+        		pixelWriter.setColor((int) (x1-back.getX()), (int) (y1-back.getY()), c);
         	else if(flip && negate)
         		pixelWriter.setColor((int) -(y1-back.getX()), (int) (x1-back.getY()), c);
         	else if(flip && !negate)
