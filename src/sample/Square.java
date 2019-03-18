@@ -29,7 +29,6 @@ public class Square {
     private WritableImage image;
     private double prevx,prevy;
     private Color userColor;
-    private boolean mouseDown;
 
     private Random rand;
 
@@ -99,15 +98,14 @@ public class Square {
                 if(state == STATE_EXITED)
                     state = STATE_IDLE;
                 else if (state == STATE_SELECTED){
-                    int count = 0;
+                    double count = 0;
                 	for (int x = 0; x < sizex; x++) {
                         for (int y = 0; y < sizey; y++) {
                             if(!pixelReader.getColor(x, y).equals(Color.WHITE))
                             	count++;
                         }
                     }
-                	
-                	if(count/(sizex*sizey) >= THRESHHOLD){
+                	if((count/(sizex*sizey)) >= THRESHHOLD){
         				state = STATE_CLAIMED;
         				fill(userColor);
         			}
@@ -187,9 +185,9 @@ public class Square {
         while(x1<= x2){
         	
         	if(negate && !flip)
-        		pixelWriter.setColor((int) -(x1-back.getX()), (int) (y1-back.getY()), c);
+        		pixelWriter.setColor((int) (-x1-back.getX()), (int) (y1-back.getY()), c);
         	else if(flip && negate)
-        		pixelWriter.setColor((int) -(y1-back.getX()), (int) (x1-back.getY()), c);
+        		pixelWriter.setColor((int) (-y1-back.getX()), (int) (x1-back.getY()), c);
         	else if(flip && !negate)
         		pixelWriter.setColor((int) (y1-back.getX()), (int) (x1-back.getY()), c);
         	else

@@ -28,7 +28,9 @@ public class Main extends Application {
 
 
         Square s = new Square(20,20,50,50,"test");
+        s.setUsrClr(Color.BLUE);
         Square s2 = new Square(100,100,500,500,"test2");
+        s2.setUsrClr(Color.BLUE);
         Pane root = new Pane();
         root.getChildren().add(new ImageView(image));
         root.getChildren().addAll(s.getImage(),s2.getImage());
