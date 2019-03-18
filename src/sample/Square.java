@@ -7,6 +7,9 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+
+import static java.lang.StrictMath.floor;
+
 import java.util.Random;
 
 public class Square {
@@ -26,6 +29,7 @@ public class Square {
     private WritableImage image;
     private double prevx,prevy;
     private Color userColor;
+    private boolean mouseDown;
 
     private Random rand;
 
@@ -60,6 +64,7 @@ public class Square {
     }
 
     private void init(){
+    	
         back.setOnMouseEntered(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -79,6 +84,8 @@ public class Square {
                     	prevy = event.getY();
                     }
                     drawline(prevx,prevy,event.getX(),event.getY(),userColor);
+                    prevx = event.getX();
+                    prevy = event.getY();
                 }
                 event.consume();
             }
@@ -116,7 +123,6 @@ public class Square {
             public void handle(MouseEvent event) {
                 if(event.isPrimaryButtonDown() && state == STATE_SELECTED) {
                     state = STATE_EXITED;
-                    System.out.println(state);
                 }
                 if (state == STATE_CLAIMED)
 
@@ -134,9 +140,66 @@ public class Square {
     }
 
     public void drawline(double x1, double y1, double x2, double y2, Color c){
-        
+        double tmp;
+        boolean flip = false;
+        boolean negate = false;
+    	if( y2 < y1) {
+    		tmp = y2;
+    		y2 = y1;
+    		y1 = tmp;
+    		tmp = x2;
+    		x2 = x1;
+    		x1 = tmp;
+    	}
+    	
+    	if((x2-x1) > 0) {
+    		if((x2-x1) >= (y2-y1)) {
+    			
+    		}else {
+    			tmp = x1;
+    			x1 = y1;
+    			y1 = tmp;
+    			tmp = y2;
+    			y2 = x2;
+    			x2 = tmp;
+    			flip = true;
+    		}
+    			
+    	}else {
+    		
+    		if(-(x2-x1) >= (y2-y1)) {
+    			tmp = -x1;
+    			x1 = y1;
+    			y1 = tmp;
+    			tmp = y2;
+    			y2 = -x2;
+    			x2 = tmp;
+    			flip = true;
+    			negate = true;
+    		}else {
+    			x1 = -x1;
+    			x2 = -x2;
+    			negate = true;
+    		}
+    	}
+    	
+    	double m = (y2-y1)/(x2-x1);
+        while(x1<= x2){
+        	
+        	if(negate && !flip)
+        		pixelWriter.setColor((int) -(x1-back.getX()), (int) (y1-back.getY()), c);
+        	else if(flip && negate)
+        		pixelWriter.setColor((int) -(y1-back.getX()), (int) (x1-back.getY()), c);
+        	else if(flip && !negate)
+        		pixelWriter.setColor((int) (y1-back.getX()), (int) (x1-back.getY()), c);
+        	else
+        		pixelWriter.setColor((int) (x1-back.getX()), (int) (y1-back.getY()), c);
+            x1++;
+            y1+=m;
+        }
     	
     }
+    	
 
     private void clear (){
         for (int x =0 ; x < sizex ; x++){
@@ -144,6 +207,8 @@ public class Square {
                 pixelWriter.setColor(x,y, Color.WHITE);
             }
         }
+        prevx = -1;
+        prevy = -1;
 
     }
 
