@@ -22,7 +22,7 @@ public class Main extends Application {
 
         for (int x = 0; x < 1600; x++) {
             for (int y = 0; y < 900; y++) {
-                writer.setColor(x, y, Color.BLUEVIOLET);
+                writer.setColor(x, y, Color.GRAY);
             }
         }
         Pane root = new Pane();

@@ -18,11 +18,11 @@ public class Game {
     public void start(){
         objects = new HashMap<>();
         int numInRow = 20;
-        int numInCol= 10;
+        int numInCol= 14;
         Square s;
         for(int i = 0; i < numInRow;i++){
             for(int j = 0; j < numInCol; j++){
-                s = new Square(10+60*i,10+60*j,50,50,this);
+                s = new Square(10+63*i,10+63*j,50,50,this);
                 byte[] array = new byte[7]; // length is bounded by 7
                 new Random().nextBytes(array);
                 String generatedString = new String(array, Charset.forName("UTF-8"));
