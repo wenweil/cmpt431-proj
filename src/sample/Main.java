@@ -25,16 +25,10 @@ public class Main extends Application {
                 writer.setColor(x, y, Color.BLUEVIOLET);
             }
         }
-
-
-        Square s = new Square(20,20,50,50,"test");
-        s.setUsrClr(Color.BLUE);
-        Square s2 = new Square(100,100,500,500,"test2");
-        s2.setUsrClr(Color.BLUE);
         Pane root = new Pane();
         root.getChildren().add(new ImageView(image));
-        root.getChildren().addAll(s.getImage(),s2.getImage());
-        s2.setState(Square.STATE_IDLE);
+        Game g = new Game(root);
+        g.start();
         Scene scene = new Scene(root, 1600, 900);
 
         primaryStage.setScene(scene);

@@ -8,8 +8,6 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
-import static java.lang.StrictMath.floor;
-
 import java.util.Random;
 
 public class Square {
@@ -29,12 +27,13 @@ public class Square {
     private WritableImage image;
     private double prevx,prevy;
     private Color userColor;
+    private Game game;
 
     private Random rand;
 
     private int state;
 
-    public Square(int offsetx, int offsety, int sizex, int sizey, String entityID) {
+    public Square(int offsetx, int offsety, int sizex, int sizey, Game game) {
 
 
         this.sizex = sizex;
@@ -44,6 +43,7 @@ public class Square {
         this.back = new ImageView(this.image);
         this.pixelReader = image.getPixelReader();
         this.pixelWriter = image.getPixelWriter();
+        this.game = game;
 
         back.setX(offsetx);
         back.setY(offsety);
@@ -68,6 +68,7 @@ public class Square {
             @Override
             public void handle(MouseEvent event) {
                 if(state == STATE_IDLE) {
+                    System.out.println(entityID);
                     state = STATE_SELECTED;
                 }
                 event.consume();
@@ -149,10 +150,10 @@ public class Square {
     		x2 = x1;
     		x1 = tmp;
     	}
-    	
+
     	if((x2-x1) > 0) {
     		if((x2-x1) >= (y2-y1)) {
-    			
+
     		}else {
     			tmp = x1;
     			x1 = y1;
@@ -162,9 +163,9 @@ public class Square {
     			x2 = tmp;
     			flip = true;
     		}
-    			
+
     	}else {
-    		
+
     		if(-(x2-x1) >= (y2-y1)) {
     			tmp = -x1;
     			x1 = y1;
@@ -180,10 +181,10 @@ public class Square {
     			negate = true;
     		}
     	}
-    	
+
     	double m = (y2-y1)/(x2-x1);
         while(x1<= x2){
-        	
+
         	if(negate && !flip)
         		pixelWriter.setColor((int) (-x1-back.getX()), (int) (y1-back.getY()), c);
         	else if(flip && negate)
@@ -195,7 +196,7 @@ public class Square {
             x1++;
             y1+=m;
         }
-    	
+
     }
     	
 
@@ -224,6 +225,10 @@ public class Square {
 
     public ImageView getImage(){
         return back;
+    }
+
+    public void setEntityID(String ID){
+        entityID = ID;
     }
 
 }
