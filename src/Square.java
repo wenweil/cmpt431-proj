@@ -1,5 +1,3 @@
-package sample;
-
 import javafx.event.EventHandler;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;

@@ -1,10 +1,9 @@
-package sample;
-
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Random;
 
 public class Game {
     private final Pane root;
