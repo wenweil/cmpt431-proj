@@ -216,6 +216,14 @@ public class Square {
             }
         }
     }
+
+    private void drawSphere(int x, int y, Color c,int size){
+        for (int i = 0; i < size; i++){
+            for (int j = 0;j < size; j++){
+
+            }
+        }
+    }
     
     public void setUsrClr(Color userColor) {
     	this.userColor = userColor;
