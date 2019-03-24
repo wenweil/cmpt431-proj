@@ -24,7 +24,6 @@ public class Square {
     private ImageView back;
     private WritableImage image;
     private double prevx,prevy;
-    private Color userColor;
     private Game game;
 
     private Random rand;
@@ -81,7 +80,7 @@ public class Square {
                     	prevx = event.getX();
                     	prevy = event.getY();
                     }
-                    drawline(prevx,prevy,event.getX(),event.getY(),userColor);
+                    drawline(prevx,prevy,event.getX(),event.getY(),game.getUsrClr());
                     prevx = event.getX();
                     prevy = event.getY();
                 }
@@ -106,7 +105,7 @@ public class Square {
                     }
                 	if((count/(sizex*sizey)) >= THRESHHOLD){
         				state = STATE_CLAIMED;
-        				fill(userColor);
+        				fill(game.getUsrClr());
         			}
                 	else
                 		clear();
@@ -229,10 +228,6 @@ public class Square {
                 }
             }
         }
-    }
-    
-    public void setUsrClr(Color userColor) {
-    	this.userColor = userColor;
     }
 
     public ImageView getImage(){
