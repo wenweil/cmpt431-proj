@@ -10,6 +10,7 @@ public class Game {
 
     private HashMap<String,Square> objects;
     private int brushSize = 3;
+    private Color usrClr = Color.BLUE;
 
     public Game(Pane root){
         this.root = root;
@@ -27,11 +28,14 @@ public class Game {
                 new Random().nextBytes(array);
                 String generatedString = new String(array, Charset.forName("UTF-8"));
                 s.setEntityID(generatedString);
-                s.setUsrClr(Color.BLUE);
                 objects.put(generatedString, s);
                 root.getChildren().addAll(s.getImage());
             }
         }
+    }
+
+    public Color getUsrClr() {
+        return usrClr;
     }
 
     public void setBrushSize(int sz){
