@@ -184,13 +184,13 @@ public class Square {
         while(x1<= x2){
 
         	if(negate && !flip)
-        		pixelWriter.setColor((int) (-x1-back.getX()), (int) (y1-back.getY()), c);
-        	else if(flip && negate)
-        		pixelWriter.setColor((int) (-y1-back.getX()), (int) (x1-back.getY()), c);
-        	else if(flip && !negate)
-        		pixelWriter.setColor((int) (y1-back.getX()), (int) (x1-back.getY()), c);
-        	else
-        		pixelWriter.setColor((int) (x1-back.getX()), (int) (y1-back.getY()), c);
+        		drawSphere((int) (-x1-back.getX()), (int) (y1-back.getY()), c,game.getBrushSize());
+        	if(flip && negate)
+        		drawSphere((int) (-y1-back.getX()), (int) (x1-back.getY()), c,game.getBrushSize());
+        	if(flip && !negate)
+        		drawSphere((int) (y1-back.getX()), (int) (x1-back.getY()), c,game.getBrushSize());
+        	if(!flip && !negate)
+        		drawSphere((int) (x1-back.getX()), (int) (y1-back.getY()), c,game.getBrushSize());
             x1++;
             y1+=m;
         }
@@ -218,9 +218,15 @@ public class Square {
     }
 
     private void drawSphere(int x, int y, Color c,int size){
-        for (int i = 0; i < size; i++){
-            for (int j = 0;j < size; j++){
-
+        for (int i = -size; i < size; i++){
+            for (int j = -size;j < size; j++){
+                if ((x - i) >= 0 && (x-i)< this.sizex){
+                    if((y - j) >= 0 && (y-j)< this.sizey){
+                        if( i*i+j*j <= size*size){
+                            pixelWriter.setColor(x-i, y-j, c);
+                        }
+                    }
+                }
             }
         }
     }

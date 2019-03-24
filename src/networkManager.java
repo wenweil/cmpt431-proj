@@ -9,5 +9,6 @@ public interface networkManager {
     Game receiveGameState();
     void sendImage(WritableImage img);
     WritableImage receiveImage();
+    boolean getMutexByID(String ID);
 
 }
