@@ -1,5 +1,3 @@
-package sample;
-
 import javafx.event.EventHandler;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
@@ -215,6 +213,14 @@ public class Square {
         for (int x = 0; x < sizex; x++) {
             for (int y = 0; y < sizey; y++) {
                 pixelWriter.setColor(x, y, c);
+            }
+        }
+    }
+
+    private void drawSphere(int x, int y, Color c,int size){
+        for (int i = 0; i < size; i++){
+            for (int j = 0;j < size; j++){
+
             }
         }
     }
