@@ -34,6 +34,10 @@ public class Game {
         }
     }
 
+    public void clear(){
+        objects.clear();
+    }
+
     public Color getUsrClr() {
         return usrClr;
     }
