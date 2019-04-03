@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import Game.Main;
+
 
 public class Server {
 
@@ -13,7 +15,7 @@ public class Server {
 
   static {
     try {
-      instance = new Server(4446);
+      instance = new Server(Main.serverPort);
     } catch (IOException e) {
       e.printStackTrace();
     }

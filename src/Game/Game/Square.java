@@ -110,8 +110,10 @@ public class Square {
                         state = STATE_CLAIMED;
                         fill(game.getUsrClr());
                     }
-                    else
+                    else {
+                    	game.reqUnlock(entityID);
                         clear();
+                    }
                 }
                 event.consume();
             }
@@ -133,6 +135,7 @@ public class Square {
                         fill(game.getUsrClr());
                     }
                     else {
+                    	game.reqUnlock(entityID);
                         clear();
                         state = STATE_IDLE;
                     }

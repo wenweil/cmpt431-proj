@@ -33,10 +33,14 @@ public class Game {
 
     public ArrayBlockingQueue<SquareStringRequest> requestPakets;
 
-    private Server s = Server.getInstance();
+    private Server s = null;
+    
+    private String UserID;
 
     public void serverStart(){
+    	s = Server.getInstance();
         s.setGameData(new GameData(brushSize,threashhold, Main.boardHeight,Main.boardWidth,Main.numBox));
+        setupMutex();
         Thread thread = new Thread(s.getListener());
         Thread thread1 = new Thread(s.getSender());
     }
@@ -44,7 +48,17 @@ public class Game {
     public Game(Pane root){
         squares = new HashMap<>();
         requestPakets = new ArrayBlockingQueue<SquareStringRequest>(2048);
+        
+        byte[] array = new byte[7]; // length is bounded by 7
+
+        new Random().nextBytes(array);
+
+        String generatedString = new String(array, Charset.forName("UTF-8"));
+        
+        this.UserID = generatedString;
+        
         this.root = root;
+        
     }
 
     private void setupMutex(){
@@ -102,11 +116,24 @@ public class Game {
     }
 
     public boolean getLock(String squareID){
+    	
+    	if (s != null) {
+    		System.out.print(squareID+" ");
+    		return mutex.get(squareID).reqLock(UserID);
+    	}
+    	//todo add getlock when server is not running
+    	return true;
 
-        return true;
     }
 
     public boolean reqUnlock (String squareID){
+    	
+    	if (s != null) {
+    		System.out.print(squareID+" ");
+    		return mutex.get(squareID).reqUnlock(UserID);
+    	}
+    	
+    	
         return true;
     }
 

@@ -34,7 +34,7 @@ public class Main extends Application {
     public static int boardWidth;
     public static int boardHeight;
     public static int numBox;
-    public static final int serverPort = 4446;
+    public static final int serverPort = 44466;
 
 
     @Override
@@ -82,6 +82,8 @@ public class Main extends Application {
                 root.getChildren().add(new ImageView(image));
 
                 game.start();
+                
+                game.serverStart();
 
                 Scene scene = new Scene(root, boardHeight, boardWidth);
 
