@@ -4,23 +4,28 @@ import java.io.IOException;
 import java.net.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import Game.Main;
 
 public class Client{
 
-  private static Client instance;
+  private static Client instance = null;
   public static BlockingQueue<DatagramPacket> outgoingPackets = new ArrayBlockingQueue<>(512);
-
+  private ExecutorService threadExecutor = Executors.newFixedThreadPool(1000);
   // create static client instance
-  static {
-    try {
-      instance = new Client("127.0.0.1",4446,4445);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
+  
 
   // method to retrieve the instance
   public static Client getInstance(){
+	if (instance == null) {
+	    try {
+	      instance = new Client(Main.serverIP,Main.serverPort,4445);
+	    } catch (IOException e) {
+	      e.printStackTrace();
+	    }
+	}
     return instance;
   }
 
@@ -55,5 +60,9 @@ public class Client{
     new Thread(new Sender()).start();
 
   }
+  
+  public ExecutorService getThreadExecutor() {
+	    return threadExecutor;
+	  }
 
   }

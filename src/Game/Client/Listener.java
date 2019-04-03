@@ -5,6 +5,7 @@ import Game.Main;
 import Game.Packets.ConnectionResponsePacket;
 import Game.Packets.SquareStringRequest;
 import Game.Packets.SquareStringResponse;
+import Game.Strategies.stamps;
 import Game.Utilities.Utilities;
 
 import java.io.IOException;
@@ -36,6 +37,7 @@ public class Listener implements Runnable {
 
         udpSocket.receive(packet);
 
+        
         processIncomingPacket(packet);
 
       }
@@ -57,6 +59,8 @@ public class Listener implements Runnable {
 
 
       public void run(){
+    	  
+    	System.out.println("received");
         byte[] packetData = packet.getData();
 
         InetAddress remoteAddress = packet.getAddress();
@@ -106,6 +110,9 @@ public class Listener implements Runnable {
               System.out.println(game.getSquare().size());
 
             }
+          else if (stamp == stamps.MUTEXLOCKRESPONSE.val()) {
+        	  
+          }
 
         }
         catch (IOException |ClassNotFoundException e) {

@@ -8,6 +8,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
+import java.io.IOException;
 import java.util.Random;
 
 public class Square {
@@ -76,15 +77,18 @@ public class Square {
             @Override
             public void handle(MouseEvent event) {
                 if (state == STATE_SELECTED && game.getLock(entityID)){
-                    if(prevx == -1 || prevy == -1) {
-                        prevx = event.getX();
-                        prevy = event.getY();
-                    }
+				    if(prevx == -1 || prevy == -1) {
+				        prevx = event.getX();
+				        prevy = event.getY();
+				    }
 
-                    drawline(prevx-back.getX(),prevy-back.getY(),event.getX()-back.getX(),event.getY()-back.getY(),game.getUsrClr());
-                    prevx = event.getX();
-                    prevy = event.getY();
-                }
+				    drawline(prevx-back.getX(),prevy-back.getY(),event.getX()-back.getX(),event.getY()-back.getY(),game.getUsrClr());
+				    
+				    game.sendTwoPointsforDrawLine(prevx-back.getX(),prevy-back.getY(),event.getX()-back.getX(),event.getY()-back.getY(),entityID);
+				    
+				    prevx = event.getX();
+				    prevy = event.getY();
+				}
                 event.consume();
             }
         });
@@ -109,8 +113,10 @@ public class Square {
                     if((count/(sizex*sizey)) >= game.getThreashhold() && game.reqUnlock(entityID)){
                         state = STATE_CLAIMED;
                         fill(game.getUsrClr());
+                        game.sendClaimedState(entityID);
                     }
                     else {
+                    	game.sendDrawFail(entityID);
                     	game.reqUnlock(entityID);
                         clear();
                     }
@@ -133,14 +139,15 @@ public class Square {
                     if((count/(sizex*sizey)) >= game.getThreashhold() && game.reqUnlock(entityID)){
                         state = STATE_CLAIMED;
                         fill(game.getUsrClr());
+                        game.sendClaimedState(entityID);
                     }
                     else {
+                    	game.sendDrawFail(entityID);
                     	game.reqUnlock(entityID);
                         clear();
                         state = STATE_IDLE;
                     }
 
-                    //todo get server and client to also clear
                 }
                 if (state == STATE_CLAIMED)
 

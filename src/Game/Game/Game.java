@@ -1,15 +1,27 @@
 package Game.Game;
 
+import Game.Packets.MutexRequestPacket;
 import Game.Packets.SquareStringRequest;
 import Game.Server.GameData;
 import Game.Server.Server;
+import Game.Strategies.stamps;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import Game.Main;
+import Game.Client.Client;
+
+import static Game.Utilities.Utilities.convertObjectToBytes;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class Game {
     private final Pane root;
@@ -20,7 +32,7 @@ public class Game {
 
 
     private int brushSize = 3;
-    private Color usrClr = Color.BLUE;
+    private Color usrClr;
 
     private int squareSize = 50;
 
@@ -43,22 +55,38 @@ public class Game {
         setupMutex();
         Thread thread = new Thread(s.getListener());
         Thread thread1 = new Thread(s.getSender());
+        thread.start();
+        thread1.start();
+        
     }
 
     public Game(Pane root){
         squares = new HashMap<>();
-        requestPakets = new ArrayBlockingQueue<SquareStringRequest>(2048);
+        Client.getInstance();
+		requestPakets = new ArrayBlockingQueue<SquareStringRequest>(2048);
         
         byte[] array = new byte[7]; // length is bounded by 7
+        
+        Random rand = new Random();
 
-        new Random().nextBytes(array);
+        rand.nextBytes(array);
 
         String generatedString = new String(array, Charset.forName("UTF-8"));
+        
+        usrClr = new Color(rand.nextDouble(),rand.nextDouble(),rand.nextDouble(),1);
         
         this.UserID = generatedString;
         
         this.root = root;
         
+    }
+    
+    public void populateWIthRequestData() throws InterruptedException {
+        for(int rowNumber = 0; rowNumber < numSqInCol; rowNumber++)
+            for(int colNumer = 0; colNumer < numSqInRow; colNumer++){
+                SquareStringRequest ssr = new SquareStringRequest(colNumer,rowNumber);
+                requestPakets.put(ssr);
+            }
     }
 
     private void setupMutex(){
@@ -115,12 +143,37 @@ public class Game {
         return sq;
     }
 
-    public boolean getLock(String squareID){
+    public boolean getLock(String squareID) {
     	
     	if (s != null) {
     		System.out.print(squareID+" ");
     		return mutex.get(squareID).reqLock(UserID);
     	}
+    	
+    	Serializable r = (Serializable)new MutexRequestPacket(squareID,UserID);
+    	
+    	byte[] data;
+		try {
+			data = convertObjectToBytes(stamps.MUTEXLOCKREQUEST.val(),r);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+    	
+    	DatagramPacket p;
+		try {
+			p = new DatagramPacket(data,data.length,InetAddress.getByName(Main.serverIP),Main.serverPort);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			return false;
+		}
+    	
+    	try {
+			Client.outgoingPackets.put(p);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return false;
+		}
     	//todo add getlock when server is not running
     	return true;
 
@@ -182,6 +235,31 @@ public class Game {
         }
         setupMutex();
     }
+    
+    public void sendClaimedState(String EID) {
+    	if (this.s != null) {
+    		//todo broadcast this message to every client
+    	}else {
+    		//todo send message to server
+    	}
+    }
+    
+    public void sendTwoPointsforDrawLine(double x1, double y1, double x2, double y2, String entityID) {
+		if (this.s != null) {
+    		// todo broadcast this message to every client
+    	}else {
+    		//todo send message to server
+    	}
+		
+	}
+    
+    public void sendDrawFail(String EID) {
+    	if (this.s != null) {
+    		//todo broadcast this message to every client
+    	}else {
+    		//todo send message to server
+    	}
+    }
 
 
     public void setNumSqInRow(int numSqInRow) {
@@ -216,5 +294,7 @@ public class Game {
     public HashMap<String,Square> getSquare(){
         return squares;
     }
+
+	
 
 }

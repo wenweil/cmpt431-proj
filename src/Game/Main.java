@@ -3,6 +3,7 @@ package Game;
 import Game.Client.Client;
 import Game.Client.GameStages.Connection;
 import Game.Game.Game;
+import Game.Packets.SquareStringResponse;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -19,6 +20,9 @@ import javafx.stage.Stage;
 
 import static java.lang.Thread.sleep;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class Main extends Application {
     public static Boolean isReady = false;
@@ -34,7 +38,8 @@ public class Main extends Application {
     public static int boardWidth;
     public static int boardHeight;
     public static int numBox;
-    public static final int serverPort = 44466;
+    public static final int serverPort = 4446;
+    public static List<SquareStringResponse> squareResponses = new ArrayList<>();
 
 
     @Override
@@ -102,7 +107,6 @@ public class Main extends Application {
                     error = false;
                     serverIP = IPField.getText();
                     Client client = Client.getInstance();
-                    sleep(1000);
                 }
                 catch(Exception exc){
                     exc.printStackTrace();
@@ -112,21 +116,22 @@ public class Main extends Application {
 
                 if (!error){
 
-                    new Thread(new Connection()).start();
-                    //new Thread(new SquareInitalization());
+                	Thread th = new Thread(new Connection());
+                    th.start();
+					try {
+						th.join();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 
-                    synchronized (isReady){
-                        try {
-                            isReady.wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
 
                     primaryStage.setTitle("CMPT 431 - Project");
 
                     WritableImage image = new WritableImage(boardWidth,boardHeight);
                     PixelWriter writer = image.getPixelWriter();
+
 
                     for (int x = 0; x < boardWidth; x++) {
                         for (int y = 0; y < boardHeight; y++) {
@@ -135,8 +140,16 @@ public class Main extends Application {
                     }
 
                     root.getChildren().add(new ImageView(image));
-                    Scene scene = new Scene(root, boardWidth, boardHeight);
 
+                    // initalize squares;
+                    for(SquareStringResponse res: squareResponses){
+                        int col = res.getColNumber();
+                        int row = res.getRowNumber();
+                        String s = res.getCode();
+                        game.addSquare(s,col,row);
+                    }
+
+                    Scene scene = new Scene(root, boardWidth, boardHeight);
                     primaryStage.setScene(scene);
 
                     primaryStage.show();
