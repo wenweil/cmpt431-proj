@@ -1,3 +1,5 @@
+package Game.GameOld;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
@@ -9,6 +11,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+    public static boolean cVarClientSender = true;
+    public static boolean cVarClientReciever = true;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -23,15 +27,25 @@ public class Main extends Application {
                 writer.setColor(x, y, Color.GRAY);
             }
         }
+
         Pane root = new Pane();
         root.getChildren().add(new ImageView(image));
+
         Game g = new Game(root);
         g.start();
         Scene scene = new Scene(root, 1600, 900);
 
         primaryStage.setScene(scene);
-
         primaryStage.show();
+
+        // initalize the client
+        Client client = new Client("127.0.1.1");
+        Thread cl = new Thread(client);
+        cl.start();
+
+
+
+
     }
 
 
