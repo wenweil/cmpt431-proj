@@ -100,6 +100,7 @@ public class Listener implements Runnable {
         	  SendStringPacket p = (SendStringPacket) object;
         	  HashMap<String,Square> squares = Main.game.getSquare();
         	  squares.get(p.getString()).clear();
+        	  squares.get(p.getString()).setState(Square.STATE_IDLE);
         	  
           }else if(stamp == stamps.DRAWCLAIM.val()) {
         	  SendStringPacket p = (SendStringPacket) object;
@@ -107,6 +108,7 @@ public class Listener implements Runnable {
         	  String eid = p.getString().split(";")[0];
         	  String color = p.getString().split(";")[1];
         	  squares.get(eid).fill(Color.valueOf(color));;
+        	  squares.get(eid).setState(Square.STATE_CLAIMED);
           }
 
 

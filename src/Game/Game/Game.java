@@ -428,8 +428,8 @@ public class Game {
     		//todo broadcast this message to every client
     	}else {
     		//todo send message to server
-    		SendStringPacket p = new SendStringPacket(EID + ";"+ usrClr.toString());
-    		byte stamp = stamps.DRAWCLAIM.val();
+    		SendStringPacket p = new SendStringPacket(EID);
+    		byte stamp = stamps.DRAWFAIL.val();
     		try {
     			byte[] data = convertObjectToBytes(stamp,p);
 				try {
