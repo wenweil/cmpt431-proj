@@ -1,6 +1,8 @@
 package Game.Strategies;
 
+import Game.Main;
 import Game.Client.Client;
+import Game.Game.Game;
 import Game.Packets.ConnectionRequestPacket;
 
 import java.io.IOException;
@@ -19,7 +21,7 @@ public class ConnectionRequest implements ClientRequestStrategy {
 
     try {
 
-      Serializable r = (Serializable) new ConnectionRequestPacket(1234);
+      Serializable r = (Serializable) new ConnectionRequestPacket(Main.game.getusrID());
 
       data = convertObjectToBytes((byte) 1, r);
 

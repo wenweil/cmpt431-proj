@@ -97,6 +97,7 @@ public class Square {
         back.setOnMouseReleased(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+            	System.out.println("release print "+entityID);
                 if(state == STATE_EXITED) {
                     state = STATE_IDLE;
                     clear();
@@ -225,7 +226,7 @@ public class Square {
     }
 
 
-    private void clear (){
+    public void clear (){
         for (int x =0 ; x < sizex ; x++){
             for (int y =0 ; y < sizey ; y++) {
                 pixelWriter.setColor(x,y, Color.WHITE);

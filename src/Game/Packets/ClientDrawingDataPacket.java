@@ -11,13 +11,14 @@ import java.io.Serializable;
 // Contains the information which is used to draw
 public class ClientDrawingDataPacket implements Serializable {
 
-  private ClientDrawingDataPacket() {}
+  public ClientDrawingDataPacket() {}
 
   private Double x1;
   private Double y1;
   private Double x2;
   private Double y2;
   private transient Color color;
+  private String EID;
 
   private void readObject(ObjectInputStream in)
       throws IOException, ClassNotFoundException {
@@ -79,7 +80,15 @@ public class ClientDrawingDataPacket implements Serializable {
     this.color = color;
   }
 
-
+  public void setEID(String eid) {
+	  this.EID = eid;
+  }
+  
+  public String getEID() {
+	  return EID;
+  }
+  
+  
 
   public static class PacketBuilder {
     private Double x1;

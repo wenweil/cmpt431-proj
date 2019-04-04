@@ -4,17 +4,22 @@ import Game.Client.GameStages.Connection;
 import Game.Game.Square;
 import Game.Game.Squares;
 import Game.Main;
+import Game.Packets.ClientDrawingDataPacket;
 import Game.Packets.ConnectionResponsePacket;
 import Game.Packets.MutexResponsePacket;
+import Game.Packets.SendStringPacket;
 import Game.Packets.SquareStringRequest;
 import Game.Packets.SquareStringResponse;
+import Game.Strategies.stamps;
 import Game.Utilities.Utilities;
+import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.HashMap;
 
 import static Game.Client.GameStages.Connection.cndVar;
 import static Game.Client.GameStages.Connection.currentRequest;
@@ -74,6 +79,7 @@ public class Listener implements Runnable {
 
         // get data
         byte[] data = Utilities.extractData(packet,size);
+        
 
         try {
           Serializable object = Utilities.deserializeObject(data);
@@ -111,6 +117,22 @@ public class Listener implements Runnable {
               reqLock = lock;
               reqLock.notify();
             }
+          }
+          else if (stamp == stamps.DRAWINGDATA.val()) {
+        	  ClientDrawingDataPacket p = (ClientDrawingDataPacket) object;
+        	  HashMap<String,Square> squares = Main.game.getSquare();
+        	  squares.get(p.getEID()).drawline(p.getX1(), p.getY1(), p.getX2(), p.getY2(), p.getColor());
+          }else if (stamp == stamps.DRAWFAIL.val()) {
+        	  SendStringPacket p = (SendStringPacket) object;
+        	  HashMap<String,Square> squares = Main.game.getSquare();
+        	  squares.get(p.getString()).clear();
+        	  
+          }else if(stamp == stamps.DRAWCLAIM.val()) {
+        	  SendStringPacket p = (SendStringPacket) object;
+        	  HashMap<String,Square> squares = Main.game.getSquare();
+        	  String eid = p.getString().split(";")[0];
+        	  String color = p.getString().split(";")[1];
+        	  squares.get(eid).fill(Color.valueOf(color));;
           }
 
         }

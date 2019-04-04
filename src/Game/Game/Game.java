@@ -1,6 +1,8 @@
 package Game.Game;
 
+import Game.Packets.ClientDrawingDataPacket;
 import Game.Packets.MutexRequestPacket;
+import Game.Packets.SendStringPacket;
 import Game.Packets.SquareStringRequest;
 import Game.Server.GameData;
 import Game.Server.Server;
@@ -51,14 +53,18 @@ public class Game {
 
     public static Boolean reqLock = false;
 
-    public ArrayBlockingQueue<Tuple<String,InetAddress>> tuples;
+    public ArrayBlockingQueue<Tuple<String,InetAddress,Integer>> tuples;
+    
 
-    public class Tuple<X, Y> {
+    public class Tuple<X, Y ,Z> {
         public final X x;
         public final Y y;
-        public Tuple(X x, Y y) {
+        public final Z z;
+        
+        public Tuple(X x, Y y, Z z) {
             this.x = x;
             this.y = y;
+            this.z = z;
         }
     }
 
@@ -100,6 +106,7 @@ public class Game {
     public Game(Pane root){
         squares = new HashMap<>();
 		requestPakets = new ArrayBlockingQueue<SquareStringRequest>(2048);
+		tuples = new ArrayBlockingQueue<Tuple<String,InetAddress,Integer>>(2048);
         
         byte[] array = new byte[7]; // length is bounded by 7
         
@@ -183,11 +190,12 @@ public class Game {
     public boolean getLock(String squareID) {
     	
     	if (s != null) {
-    		System.out.print(squareID+" ");
     		return mutex.get(squareID).reqLock(UserID);
     	}
     	
-    	Serializable r = new MutexRequestPacket(squareID,UserID);
+    	return true;// todo this
+    	
+    	/*Serializable r = new MutexRequestPacket(squareID,UserID);
     	
     	byte[] data;
 		try {
@@ -220,7 +228,7 @@ public class Game {
             return false;
         }
         //todo test this thing
-    	return reqLock;
+    	return reqLock;*/
 
     }
 
@@ -241,7 +249,6 @@ public class Game {
     public boolean reqUnlock (String squareID){
     	
     	if (s != null) {
-    		System.out.print(squareID+" ");
     		return mutex.get(squareID).reqUnlock(UserID);
     	}
     	
@@ -299,25 +306,144 @@ public class Game {
     public void sendClaimedState(String EID) {
     	if (this.s != null) {
     		//todo broadcast this message to every client
+    		SendStringPacket p = new SendStringPacket(EID + ";"+ usrClr.toString());
+    		byte stamp = stamps.DRAWCLAIM.val();
+    		try {
+				byte[] data = convertObjectToBytes(stamp,p);
+				for(Tuple t : tuples) {
+					try {
+						InetAddress IP = (InetAddress)t.y;
+						int port = (int) t.z;
+						Server.outgoingQueue.put(new DatagramPacket(data,data.length,IP,port));
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+				}
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		
     	}else {
+    		SendStringPacket p = new SendStringPacket(EID + ";"+ usrClr.toString());
+    		byte stamp = stamps.DRAWCLAIM.val();
+    		try {
+				byte[] data = convertObjectToBytes(stamp,p);
+				try {
+					Client.outgoingPackets.put(new DatagramPacket(data,data.length,InetAddress.getByName(Main.serverIP),Main.serverPort));
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     		//todo send message to server
     	}
     }
     
     public void sendTwoPointsforDrawLine(double x1, double y1, double x2, double y2, String entityID) {
 		if (this.s != null) {
+			ClientDrawingDataPacket p = new ClientDrawingDataPacket();
+			p.setX1(x1);
+			p.setX2(x2);
+			p.setY1(y1);
+			p.setY2(y2);
+			p.setColor(usrClr);
+			p.setEID(entityID);
+			byte stamp = stamps.DRAWINGDATA.val();
+			
+			try {
+				byte[] data = convertObjectToBytes(stamp,p);
+				for(Tuple t : tuples) {
+					try {
+						InetAddress IP = (InetAddress)t.y;
+						int port = (int) t.z;
+						Server.outgoingQueue.put(new DatagramPacket(data,data.length,IP,port));
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+				}
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
     		// todo broadcast this message to every client
     	}else {
     		//todo send message to server
+    		ClientDrawingDataPacket p = new ClientDrawingDataPacket();
+			p.setX1(x1);
+			p.setX2(x2);
+			p.setY1(y1);
+			p.setY2(y2);
+			p.setColor(usrClr);
+			p.setEID(entityID);
+			byte stamp = stamps.DRAWINGDATA.val();
+			
+			try {
+				byte[] data = convertObjectToBytes(stamp,p);
+				try {
+					Client.outgoingPackets.put(new DatagramPacket(data,data.length,InetAddress.getByName(Main.serverIP),Main.serverPort));
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		
     	}
 		
 	}
     
     public void sendDrawFail(String EID) {
     	if (this.s != null) {
+    		
+    		SendStringPacket p = new SendStringPacket(EID);
+    		byte stamp = stamps.DRAWFAIL.val();
+    		try {
+				byte[] data = convertObjectToBytes(stamp,p);
+				for(Tuple t : tuples) {
+					try {
+						InetAddress IP = (InetAddress)t.y;
+						int port = (int) t.z;
+						Server.outgoingQueue.put(new DatagramPacket(data,data.length,IP,port));
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     		//todo broadcast this message to every client
     	}else {
     		//todo send message to server
+    		SendStringPacket p = new SendStringPacket(EID + ";"+ usrClr.toString());
+    		byte stamp = stamps.DRAWCLAIM.val();
+    		try {
+    			byte[] data = convertObjectToBytes(stamp,p);
+				try {
+					Client.outgoingPackets.put(new DatagramPacket(data,data.length,InetAddress.getByName(Main.serverIP),Main.serverPort));
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
     	}
     }
 
@@ -358,6 +484,16 @@ public class Game {
     public HashMap<String,Square> getSquare(){
         return squares;
     }
+    
+    public String getusrID() {
+    	return UserID;
+    }
+
+	public void Adduser(InetAddress address, int port, String string) {
+		Tuple t = new Tuple<>(string,address,port);
+		tuples.add(t);
+		
+	}
 
 	
 

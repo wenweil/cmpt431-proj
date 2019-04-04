@@ -1,5 +1,6 @@
 package Game.Server;
 
+import Game.Main;
 import Game.Packets.ConnectionRequestPacket;
 import Game.Packets.ConnectionResponsePacket;
 
@@ -20,6 +21,8 @@ public class ServerConnectionResponse implements ServerResponseStrategy {
       ConnectionRequestPacket request = (ConnectionRequestPacket) requestObject;
       Server instance = Server.getInstance();
       GameData gameData = instance.getGameData();
+      
+      Main.game.Adduser(address,port,request.getUID());
 
       ConnectionResponsePacket response = new ConnectionResponsePacket();
       response.setBrushSize(gameData.getBrushSize());

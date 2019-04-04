@@ -6,19 +6,19 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 public class ConnectionRequestPacket implements Serializable {
-  int clientPort;
+  String userID;
 
 
-  public ConnectionRequestPacket(int clientPort) {
-    this.clientPort = clientPort;
+  public ConnectionRequestPacket(String userID) {
+    this.userID = userID;
   }
 
-  public int getClientPort() {
-    return clientPort;
+  public String getUID() {
+    return userID;
   }
 
-  public void setClientPort(int clientPort) {
-    this.clientPort = clientPort;
+  public void setClientPort(String userID) {
+    this.userID = userID;
   }
 
   private void readObject(ObjectInputStream in)

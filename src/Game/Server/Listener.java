@@ -1,7 +1,12 @@
 package Game.Server;
 
+import Game.Main;
+import Game.Game.Square;
+import Game.Packets.ClientDrawingDataPacket;
+import Game.Packets.SendStringPacket;
 import Game.Strategies.stamps;
 import Game.Utilities.Utilities;
+import javafx.scene.paint.Color;
 
 import java.io.*;
 import java.net.*;
@@ -87,6 +92,23 @@ public class Listener implements Runnable {
           else if(stamp == 7){
 
           }
+          else if (stamp == stamps.DRAWINGDATA.val()) {
+        	  ClientDrawingDataPacket p = (ClientDrawingDataPacket) object;
+        	  HashMap<String,Square> squares = Main.game.getSquare();
+        	  squares.get(p.getEID()).drawline(p.getX1(), p.getY1(), p.getX2(), p.getY2(), p.getColor());
+          }else if (stamp == stamps.DRAWFAIL.val()) {
+        	  SendStringPacket p = (SendStringPacket) object;
+        	  HashMap<String,Square> squares = Main.game.getSquare();
+        	  squares.get(p.getString()).clear();
+        	  
+          }else if(stamp == stamps.DRAWCLAIM.val()) {
+        	  SendStringPacket p = (SendStringPacket) object;
+        	  HashMap<String,Square> squares = Main.game.getSquare();
+        	  String eid = p.getString().split(";")[0];
+        	  String color = p.getString().split(";")[1];
+        	  squares.get(eid).fill(Color.valueOf(color));;
+          }
+
 
         }
         catch (IOException |ClassNotFoundException e) {
