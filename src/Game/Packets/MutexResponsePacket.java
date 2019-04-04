@@ -9,17 +9,15 @@ public class MutexResponsePacket implements Serializable {
 
   private String squareCode;
   private Boolean lock;
-  private String message;
 
   public MutexResponsePacket(){
 
   }
 
-  public MutexResponsePacket(String squareCode,Boolean lock,String message){
+  public MutexResponsePacket(String squareCode,Boolean lock){
 
     this.squareCode = squareCode;
     this.lock = lock;
-    this.message = message;
   }
 
   private void readObject(ObjectInputStream in)
@@ -48,11 +46,4 @@ public class MutexResponsePacket implements Serializable {
     this.lock = lock;
   }
 
-  public String getMessage() {
-    return message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
-  }
 }

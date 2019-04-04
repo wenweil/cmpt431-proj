@@ -49,6 +49,19 @@ public class Game {
     
     private String UserID;
 
+    public static Boolean reqLock = false;
+
+    public ArrayBlockingQueue<Tuple<String,InetAddress>> tuples;
+
+    public class Tuple<X, Y> {
+        public final X x;
+        public final Y y;
+        public Tuple(X x, Y y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
     public void serverStart(){
     	s = Server.getInstance();
        
@@ -107,7 +120,6 @@ public class Game {
     public void populateWIthRequestData() throws InterruptedException {
         for(int rowNumber = 0; rowNumber < numSqInCol; rowNumber++)
             for(int colNumer = 0; colNumer < numSqInRow; colNumer++){
-            	System.out.println(Thread.currentThread().getName()+" "+rowNumber);
                 SquareStringRequest ssr = new SquareStringRequest(colNumer,rowNumber);
                 requestPakets.put(ssr);
             }
@@ -175,7 +187,7 @@ public class Game {
     		return mutex.get(squareID).reqLock(UserID);
     	}
     	
-    	Serializable r = (Serializable)new MutexRequestPacket(squareID,UserID);
+    	Serializable r = new MutexRequestPacket(squareID,UserID);
     	
     	byte[] data;
 		try {
@@ -199,9 +211,31 @@ public class Game {
 			e.printStackTrace();
 			return false;
 		}
-    	//todo add getlock when server is not running
-    	return true;
+    	Thread t = new Thread(new waitLock());
+        t.start();
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        }
+        //todo test this thing
+    	return reqLock;
 
+    }
+
+    private class waitLock  implements Runnable {
+
+        @Override
+        public void run() {
+            synchronized (reqLock){
+                try {
+                    reqLock.wait(70);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public boolean reqUnlock (String squareID){
@@ -302,6 +336,10 @@ public class Game {
 
     public void setThreashhold(Double in){
         this.threashhold = in;
+    }
+
+    public netMutex getMutex(String EID){
+        return mutex.get(EID);
     }
 
 

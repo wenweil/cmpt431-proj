@@ -11,6 +11,10 @@ public class MutexRequestPacket implements Serializable {
     return squareCode;
   }
 
+  public String getUserID(){
+    return UserID;
+  }
+
   private String squareCode, UserID;
 
   public MutexRequestPacket(String squareCode,String UserID){

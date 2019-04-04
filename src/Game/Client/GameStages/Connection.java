@@ -34,7 +34,6 @@ public class Connection implements Runnable{
       outgoingPackets.add(packet);
       }
     System.out.println(Thread.currentThread().getName()+" Board Init is set to true");
-    System.out.println(Thread.currentThread().getName()+" "+gameData.getNumSqInRow());
 
     boardHeight = gameData.getBoardHeight();
     boardWidth = gameData.getBoardWidth();
@@ -57,7 +56,6 @@ public class Connection implements Runnable{
     // requests with the specific board cooardinates are send to server;
 
       while(true){
-    	  System.out.println(Thread.currentThread().getName()+" "+game.requestPakets.size());
           try {
               // create request Packet
               if(game.requestPakets.isEmpty() == true){
@@ -79,7 +77,6 @@ public class Connection implements Runnable{
             }
 
           if(game.requestPakets.isEmpty()==true){
-            System.out.println(Thread.currentThread().getName()+" all packets send");
             break;
           }
       }

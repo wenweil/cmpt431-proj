@@ -17,7 +17,10 @@ public class Sender implements Runnable {
         DatagramPacket packet = Server.outgoingQueue.take();
         System.out.println("packet to client send");
         System.out.println(packet.getAddress()+" "+packet.getPort());
-        Server.getInstance().getUdpSocket().send(packet);
+        if(packet != null)
+          Server.getInstance().getUdpSocket().send(packet);
+        else
+          System.out.println("There wes a IOException");
 
       } catch (InterruptedException| IOException e) {
         e.printStackTrace();

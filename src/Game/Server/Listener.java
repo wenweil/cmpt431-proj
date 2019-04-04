@@ -1,5 +1,6 @@
 package Game.Server;
 
+import Game.Strategies.stamps;
 import Game.Utilities.Utilities;
 
 import java.io.*;
@@ -79,8 +80,9 @@ public class Listener implements Runnable {
             DatagramPacket dp = new ServerStringResponse().generateServerResponse(remoteAddress,remotePort,object);
             Server.outgoingQueue.put(dp);
           }
-          else if(stamp == 5){
-
+          else if(stamp == stamps.MUTEXUNLOCKREQUEST.val()){
+            DatagramPacket dp = new ServerMutexResponse().generateServerResponse(remoteAddress,remotePort,object);
+            Server.outgoingQueue.put(dp);
           }
           else if(stamp == 7){
 

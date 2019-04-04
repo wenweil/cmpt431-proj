@@ -66,7 +66,6 @@ public class Square {
             @Override
             public void handle(MouseEvent event) {
                 if(state == STATE_IDLE) {
-                    //System.out.println(entityID);
                     state = STATE_SELECTED;
                 }
                 event.consume();
@@ -121,7 +120,6 @@ public class Square {
                         clear();
                     }
                 }
-                System.out.println(entityID);//todo remove
                 event.consume();
             }
         });

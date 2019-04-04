@@ -18,6 +18,7 @@ import java.net.InetAddress;
 
 import static Game.Client.GameStages.Connection.cndVar;
 import static Game.Client.GameStages.Connection.currentRequest;
+import static Game.Game.Game.reqLock;
 import static Game.Main.boardInit;
 
 
@@ -105,13 +106,10 @@ public class Listener implements Runnable {
             // mutex request response block
             MutexResponsePacket mutres = (MutexResponsePacket) object;
             Boolean lock = mutres.getLock();
-            Squares.getInstance().setHasLock(lock);
 
-            synchronized (Squares.getInstance().getMessage()){
-              Squares.getInstance().getMessage().notify();
-              Squares.getInstance().setMessage(true);
-              Squares.getInstance().setHasLock(lock);
-
+            synchronized (reqLock){
+              reqLock = lock;
+              reqLock.notify();
             }
           }
 

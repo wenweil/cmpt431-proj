@@ -30,6 +30,10 @@ public class Client{
     return instance;
   }
 
+  public void broadcast(byte[] data){
+
+  }
+
 
   public InetAddress getServerAddress() {
     return serverAddress;
