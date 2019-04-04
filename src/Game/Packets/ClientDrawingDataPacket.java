@@ -10,6 +10,7 @@ import java.io.Serializable;
 // Class ClientDrawingDataPacket.
 // Contains the information which is used to draw
 public class ClientDrawingDataPacket implements Serializable {
+	private static final long serialVersionUID = 1L;
 
   public ClientDrawingDataPacket() {}
 

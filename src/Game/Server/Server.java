@@ -39,6 +39,8 @@ public class Server {
 
   GameData gameData;
 
+  private ServerSocket tcpSocket;
+
 
   public GameData getGameData() {
     return gameData;
@@ -47,6 +49,7 @@ public class Server {
   private Server(int port) throws SocketException, IOException {
 
     this.udpSocket = new DatagramSocket(port);
+    this.tcpSocket = new ServerSocket(port);
 
     this.listener = new Listener(this);
     this.sender = new Sender(this);

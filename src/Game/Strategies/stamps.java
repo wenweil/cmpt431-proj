@@ -12,7 +12,9 @@ public enum stamps {
 	
 	DRAWINGDATA(55),
 	DRAWFAIL(56),
-	DRAWCLAIM(57);
+	DRAWCLAIM(57),
+	
+	UPDATELISTOFUSER(90);
 	
 	private byte b;
 	

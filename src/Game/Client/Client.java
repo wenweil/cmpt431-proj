@@ -3,6 +3,8 @@ package Game.Client;
 import java.io.IOException;
 import java.net.*;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -52,17 +54,46 @@ public class Client{
   public int getServerPort() {
     return serverPort;
   }
-
+  public static int counter =0;
   // Client that sends generated values to the
   private Client(String serverAddress, int serverPort, int localPort) throws SocketException, UnknownHostException {
 
     clientSocket = new DatagramSocket(localPort);
     this.serverAddress = InetAddress.getByName(serverAddress);
     this.serverPort = serverPort;
-
+    
     // start listner and sender threads;
     new Thread(new Listener()).start();
     new Thread(new Sender()).start();
+    Timer t = new Timer();
+    TimerTask tt = new TimerTask() {
+    	@Override
+    	public void run() {
+    		SocketAddress socketAddress = new InetSocketAddress(serverAddress, serverPort);
+    		Socket socket = new Socket();
+    		int timeout = 1000;
+    		
+    		try {
+    			socket.connect(socketAddress, timeout);
+    			if(socket.getInetAddress().isReachable(timeout)) {
+    				counter = 0;
+    			}
+    			socket.close();   			
+    		} catch(Exception e) {
+    			counter++;
+    			e.printStackTrace();
+    			System.out.println(counter);
+    			if (counter >= 5) {
+    				System.out.println("CANNOT CONNECT TO SERVER");
+    				System.out.println("TEST : " + Main.game.tuples.size());
+    			}
+    			
+    		}
+    		
+    	}
+    };
+    
+    t.scheduleAtFixedRate(tt, 0, 2000);
 
   }
   

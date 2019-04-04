@@ -2,6 +2,7 @@ package Game.Server;
 
 import Game.Main;
 import Game.Game.Square;
+import Game.Game.Game.Tuple;
 import Game.Packets.ClientDrawingDataPacket;
 import Game.Packets.SendStringPacket;
 import Game.Strategies.stamps;
@@ -79,6 +80,22 @@ public class Listener implements Runnable {
           if (stamp == 1){
             DatagramPacket dp = strategies.get("ServerConnectionResponse").generateServerResponse(remoteAddress,remotePort,object);
             Server.outgoingQueue.put(dp);
+            String s = "";
+            for(Tuple t: Main.game.tuples) {
+            	InetAddress x = (InetAddress) t.y;
+            	int port = (int) t.z;
+            	s += x.toString() + ":" +port+"|";
+            }
+            
+            SendStringPacket p = new SendStringPacket(s);
+            byte st = stamps.UPDATELISTOFUSER.val();
+            byte[] dat = Utilities.convertObjectToBytes(st,p);
+            for(Tuple t: Main.game.tuples) {
+            	InetAddress x = (InetAddress) t.y;
+            	int port = (int) t.z;
+            	Server.outgoingQueue.put(new DatagramPacket(data,data.length,x,port));
+            }
+            
 
           }
           else if (stamp == 3){

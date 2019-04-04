@@ -3,6 +3,7 @@ package Game.Client;
 import Game.Client.GameStages.Connection;
 import Game.Game.Square;
 import Game.Game.Squares;
+import Game.Game.Game.Tuple;
 import Game.Main;
 import Game.Packets.ClientDrawingDataPacket;
 import Game.Packets.ConnectionResponsePacket;
@@ -20,6 +21,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.HashMap;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import static Game.Client.GameStages.Connection.cndVar;
 import static Game.Client.GameStages.Connection.currentRequest;
@@ -104,7 +106,7 @@ public class Listener implements Runnable {
              Main.squareResponses.add(ssr);
               synchronized (cndVar){
                 currentRequest=null;
-                cndVar.notify();
+                cndVar.notifyAll();
               }
             }
           }
@@ -135,6 +137,16 @@ public class Listener implements Runnable {
         	  String color = p.getString().split(";")[1];
         	  squares.get(eid).fill(Color.valueOf(color));
         	  squares.get(eid).setState(Square.STATE_CLAIMED);
+          }else if(stamp == stamps.UPDATELISTOFUSER.val()) {
+        	  SendStringPacket p = (SendStringPacket) object;
+        	  String[] ips = p.getString().split("|");
+      		  Main.game.tuples = new ArrayBlockingQueue<Tuple<String,InetAddress,Integer>>(2048);
+      		  for(String ip : ips) {
+      			  InetAddress inet = InetAddress.getByName(ip.split(":")[0]);
+      			  int port = Integer.parseInt(ip.split(":")[1]);
+      			  Main.game.Adduser(inet, port, "");
+      		  }
+
           }
 
         }
