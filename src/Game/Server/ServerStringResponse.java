@@ -12,6 +12,8 @@ import static Game.Utilities.Utilities.convertObjectToBytes;
 
 public class ServerStringResponse implements ServerResponseStrategy {
   public DatagramPacket generateServerResponse(InetAddress destAddress, int port, Serializable object) throws IOException {
+	  
+	System.out.println("responding");
 
     SquareStringRequest ssrq = (SquareStringRequest) object;
     int row = ssrq.getRowNumber();

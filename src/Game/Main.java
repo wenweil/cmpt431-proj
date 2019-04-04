@@ -37,7 +37,7 @@ public class Main extends Application {
     public static boolean error = false;
     public static int boardWidth;
     public static int boardHeight;
-    public static int numBox;
+    public static int numboxint;
     public static final int serverPort = 4446;
     public static List<SquareStringResponse> squareResponses = new ArrayList<>();
 
@@ -67,7 +67,7 @@ public class Main extends Application {
 
             @Override
             public void handle(ActionEvent event) {
-                int numboxint = Integer.parseInt(numbox.getText());
+                numboxint = Integer.parseInt(numbox.getText());
                 game.setBrushSize(Integer.parseInt(brushSizeField.getText()));
                 game.setThreashhold(Double.parseDouble(thresh.getText()));
                 game.setNumSqInCol(numboxint);
@@ -85,8 +85,6 @@ public class Main extends Application {
                 }
 
                 root.getChildren().add(new ImageView(image));
-
-                game.start();
                 
                 game.serverStart();
 
@@ -112,7 +110,6 @@ public class Main extends Application {
                     exc.printStackTrace();
                     error = true;
                 }
-                System.out.println(error);
 
                 if (!error){
 
@@ -121,7 +118,6 @@ public class Main extends Application {
 					try {
 						th.join();
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					
@@ -146,7 +142,8 @@ public class Main extends Application {
                         int col = res.getColNumber();
                         int row = res.getRowNumber();
                         String s = res.getCode();
-                        game.addSquare(s,col,row);
+                        System.out.println(s);
+                        game.addSquare(s,row,col);
                     }
 
                     Scene scene = new Scene(root, boardWidth, boardHeight);

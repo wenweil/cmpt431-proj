@@ -121,6 +121,7 @@ public class Square {
                         clear();
                     }
                 }
+                System.out.println(entityID);//todo remove
                 event.consume();
             }
         });

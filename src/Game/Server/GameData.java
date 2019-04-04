@@ -18,7 +18,7 @@ public class GameData {
 
   private double threshold;
 
-  private String[][] squareCodes;
+  private String[][] squareCodes = new String[10][10];
   private HashMap<String,Boolean> mutexes;
 
   public int getBrushSize() {
@@ -40,14 +40,19 @@ public class GameData {
   public int getNumSqInCol() {
     return numSqInCol;
   }
+  
+  public double getThreshold() {
+	  return threshold;
+  }
 
   public GameData (int brushSize,double threshold,int boardHeight,int boardWidth , int numBox){
     this.brushSize = brushSize;
     this.threshold = threshold;
     this.boardHeight = boardHeight;
     this.boardWidth = boardWidth;
-    numSqInCol = numBox;
-    numSqInCol = numBox;
+    this.numSqInCol = numBox;
+    this.numSqInRow = numBox;
+    this.squareCodes = new String[this.numSqInCol][this.numSqInRow];
   }
 
   public GameData(){
@@ -60,7 +65,7 @@ public class GameData {
     numSqInRow = 20;
     numSqInCol = 14;
 
-    squareCodes = new String[numSqInCol][numSqInRow];
+    this.squareCodes = new String[14][20];
 
     // True mutex is available false it is not;
     mutexes = new HashMap<>();
@@ -79,6 +84,10 @@ public class GameData {
 
         squareCodes[row][col] = generatedString;
       }
+  }
+  
+  public void setSqrCodes(int row, int col,String s) {
+	  squareCodes[row][col] = s;
   }
 
   public String getSquareCode(int row, int col){

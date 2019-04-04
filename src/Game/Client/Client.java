@@ -2,6 +2,7 @@ package Game.Client;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -21,7 +22,7 @@ public class Client{
   public static Client getInstance(){
 	if (instance == null) {
 	    try {
-	      instance = new Client(Main.serverIP,Main.serverPort,4445);
+	      instance = new Client(Main.serverIP,Main.serverPort,Math.abs(new Random().nextInt()%62535+3000));
 	    } catch (IOException e) {
 	      e.printStackTrace();
 	    }

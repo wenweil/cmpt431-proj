@@ -13,15 +13,16 @@ public class Server {
 
   private static Server instance;
 
-  static {
-    try {
-      instance = new Server(Main.serverPort);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 
   public static Server getInstance(){
+	  
+	  if (instance == null) {
+		  try {
+		      instance = new Server(Main.serverPort);
+		    } catch (IOException e) {
+		      e.printStackTrace();
+		    }
+	  }
     return instance;
   }
 

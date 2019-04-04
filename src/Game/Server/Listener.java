@@ -32,10 +32,6 @@ public class Listener implements Runnable {
         DatagramSocket udpSocket = server.getUdpSocket();
 
         udpSocket.receive(packet);
-        System.out.println("packet recieved"+ packet);
-
-        System.out.println(
-            "Message from " + packet.getAddress().getHostAddress() + ": " + packet);
 
         processIncomingPacket(packet);
 

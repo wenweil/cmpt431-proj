@@ -26,20 +26,23 @@ public class Connection implements Runnable{
   public void run(){
 
     while (boardInit== false) {
-      System.out.println("adding packet to the queue");
+      System.out.println(Thread.currentThread().getName()+" adding packet to the queue");
         // send requests every 3 seconds until response from server arrives;
-      try { Thread.sleep(3000);} catch (InterruptedException e) {e.printStackTrace();}
+      try { Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
       DatagramPacket packet = new ConnectionRequest().generateClientRequest();
       // add packet to the outgoing queu
       outgoingPackets.add(packet);
       }
-    System.out.println("Board Init is set to true");
+    System.out.println(Thread.currentThread().getName()+" Board Init is set to true");
+    System.out.println(Thread.currentThread().getName()+" "+gameData.getNumSqInRow());
 
     boardHeight = gameData.getBoardHeight();
     boardWidth = gameData.getBoardWidth();
     Main.game.setNumSqInCol(gameData.getNumSqInColumn());
+    
     Main.game.setNumSqInRow(gameData.getNumSqInRow());
     Main.game.setBrushSize(gameData.getBrushSize());
+    Main.game.setThreashhold(gameData.getThreshold());
 
     // initalize grid;
     try {
@@ -48,15 +51,17 @@ public class Connection implements Runnable{
       e.printStackTrace();
     }
 
-    System.out.println("grid initalized");
+    System.out.println(Thread.currentThread().getName()+" grid initalized");
 
     // This segment intializes board squares.
     // requests with the specific board cooardinates are send to server;
 
       while(true){
+    	  System.out.println(Thread.currentThread().getName()+" "+game.requestPakets.size());
           try {
               // create request Packet
               if(game.requestPakets.isEmpty() == true){
+            	
                 break;
               }
               currentRequest = game.requestPakets.take();
@@ -74,16 +79,16 @@ public class Connection implements Runnable{
             }
 
           if(game.requestPakets.isEmpty()==true){
-            System.out.println("all packets send");
+            System.out.println(Thread.currentThread().getName()+" all packets send");
             break;
           }
       }
 
     isReady=true;
     synchronized (isReady){
-      System.out.println("calling notify all");
+      System.out.println(Thread.currentThread().getName()+" calling notify all");
       isReady.notify();
-      System.out.println("notify call called");
+      System.out.println(Thread.currentThread().getName()+" notify call called");
     }
 
 

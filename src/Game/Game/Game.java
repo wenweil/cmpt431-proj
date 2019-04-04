@@ -51,18 +51,41 @@ public class Game {
 
     public void serverStart(){
     	s = Server.getInstance();
-        s.setGameData(new GameData(brushSize,threashhold, Main.boardHeight,Main.boardWidth,Main.numBox));
-        setupMutex();
+       
+        
         Thread thread = new Thread(s.getListener());
         Thread thread1 = new Thread(s.getSender());
         thread.start();
         thread1.start();
         
+        squares = new HashMap<>();
+        Square s;
+        
+        this.s.setGameData(new GameData(brushSize,threashhold, Main.boardHeight,Main.boardWidth,Main.numboxint));
+        for (int i = 0; i < numSqInRow; i++) {
+            for (int j = 0; j < numSqInCol; j++) {
+                s = new Square(10 + 63 * i, 10 + 63 * j, squareSize, squareSize, this);
+
+                byte[] array = new byte[7]; // length is bounded by 7
+
+                new Random().nextBytes(array);
+                
+                
+                String generatedString = new String(array, Charset.forName("UTF-8"));
+                s.setEntityID(generatedString);
+                
+                this.s.getGameData().setSqrCodes(i, j, generatedString);
+
+                squares.put(generatedString, s);
+                root.getChildren().addAll(s.getImage());
+            }
+        }
+        setupMutex();
+        
     }
 
     public Game(Pane root){
         squares = new HashMap<>();
-        Client.getInstance();
 		requestPakets = new ArrayBlockingQueue<SquareStringRequest>(2048);
         
         byte[] array = new byte[7]; // length is bounded by 7
@@ -84,6 +107,7 @@ public class Game {
     public void populateWIthRequestData() throws InterruptedException {
         for(int rowNumber = 0; rowNumber < numSqInCol; rowNumber++)
             for(int colNumer = 0; colNumer < numSqInRow; colNumer++){
+            	System.out.println(Thread.currentThread().getName()+" "+rowNumber);
                 SquareStringRequest ssr = new SquareStringRequest(colNumer,rowNumber);
                 requestPakets.put(ssr);
             }
@@ -103,6 +127,7 @@ public class Game {
         int offsetY = 10 + 63 * row;
 
         Square square = new Square(offsetX,offsetY,squareSize,squareSize,this);
+        square.setEntityID(squareID);
         squares.put(squareID,square);
 
         if(!root.getChildren().contains(square.getImage())){
@@ -201,7 +226,8 @@ public class Game {
                 byte[] array = new byte[7]; // length is bounded by 7
 
                 new Random().nextBytes(array);
-
+                
+                
                 String generatedString = new String(array, Charset.forName("UTF-8"));
                 s.setEntityID(generatedString);
 

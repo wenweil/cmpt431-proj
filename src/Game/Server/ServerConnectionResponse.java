@@ -18,8 +18,6 @@ public class ServerConnectionResponse implements ServerResponseStrategy {
 
     try {
       ConnectionRequestPacket request = (ConnectionRequestPacket) requestObject;
-      System.out.println(request.getClientPort());
-
       Server instance = Server.getInstance();
       GameData gameData = instance.getGameData();
 
@@ -29,11 +27,10 @@ public class ServerConnectionResponse implements ServerResponseStrategy {
       response.setBoardHeight(gameData.getBoardHeight());
       response.setNumSqInRow(gameData.getNumSqInRow());
       response.setNumSqInColumn(gameData.getNumSqInCol());
-
+      response.setThreshold(gameData.getThreshold());
       Serializable r = (Serializable) response;
 
       byte stamp = (byte) 2;
-      System.out.println("Stamp is " + stamp);
 
       data = convertObjectToBytes(stamp,r);
 

@@ -1,11 +1,13 @@
 package Game.Client;
 
 import Game.Client.GameStages.Connection;
+import Game.Game.Square;
+import Game.Game.Squares;
 import Game.Main;
 import Game.Packets.ConnectionResponsePacket;
+import Game.Packets.MutexResponsePacket;
 import Game.Packets.SquareStringRequest;
 import Game.Packets.SquareStringResponse;
-import Game.Strategies.stamps;
 import Game.Utilities.Utilities;
 
 import java.io.IOException;
@@ -15,8 +17,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 
 import static Game.Client.GameStages.Connection.cndVar;
+import static Game.Client.GameStages.Connection.currentRequest;
 import static Game.Main.boardInit;
-import static Game.Main.game;
 
 
 public class Listener implements Runnable {
@@ -37,7 +39,6 @@ public class Listener implements Runnable {
 
         udpSocket.receive(packet);
 
-        
         processIncomingPacket(packet);
 
       }
@@ -59,8 +60,6 @@ public class Listener implements Runnable {
 
 
       public void run(){
-    	  
-    	System.out.println("received");
         byte[] packetData = packet.getData();
 
         InetAddress remoteAddress = packet.getAddress();
@@ -86,32 +85,34 @@ public class Listener implements Runnable {
           }
           else if(stamp == 4){
 
+
             SquareStringResponse ssr = (SquareStringResponse) object;
-            String squareCode = ssr.getCode();
 
             int col = ssr.getColNumber();
             int row = ssr.getRowNumber();
 
-            synchronized (cndVar){
-              cndVar.notify();
-            }
+             SquareStringRequest ssrsq = new SquareStringRequest(col,row);
 
-            // create object and make sure if it exists in the queue;
-            SquareStringRequest ssrsq = new SquareStringRequest(col,row);
-
-            //System.out.println(game.requestPakets.size());
-
-              if (Main.game.requestPakets.contains(ssrsq) == true) {
-                System.out.println("object removed from the queue");
-                Main.game.requestPakets.remove(ssrsq);
-                game.addSquare(ssr.getCode(), col, row);
+            if(ssrsq.equals(Connection.currentRequest)){
+             Main.squareResponses.add(ssr);
+              synchronized (cndVar){
+                currentRequest=null;
+                cndVar.notify();
               }
+            }
+          }
+          else if (stamp == 6){
+            // mutex request response block
+            MutexResponsePacket mutres = (MutexResponsePacket) object;
+            Boolean lock = mutres.getLock();
+            Squares.getInstance().setHasLock(lock);
 
-              System.out.println(game.getSquare().size());
+            synchronized (Squares.getInstance().getMessage()){
+              Squares.getInstance().getMessage().notify();
+              Squares.getInstance().setMessage(true);
+              Squares.getInstance().setHasLock(lock);
 
             }
-          else if (stamp == stamps.MUTEXLOCKRESPONSE.val()) {
-        	  
           }
 
         }
@@ -123,6 +124,8 @@ public class Listener implements Runnable {
       }
     }
 
-    new Thread(new ProcessPacket(packet)).start();
+    Thread task = new Thread(new ProcessPacket(packet));
+
+    Client.getInstance().getThreadExecutor().submit(task);
   }
 }
