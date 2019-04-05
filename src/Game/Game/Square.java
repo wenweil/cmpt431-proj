@@ -157,6 +157,7 @@ public class Square {
                 	  
                 	}
                 	else{
+                	  clear();
                 	  state = STATE_IDLE;
                 	  square.setGameState(STATE_IDLE);
                   }
@@ -171,7 +172,6 @@ public class Square {
                     }
 
                     SquareNetworkHandler.deleteActiveSquare();
-                    clear();
 
                     }
                    
