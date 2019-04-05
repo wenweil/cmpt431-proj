@@ -118,11 +118,38 @@ public class Listener implements Runnable {
         	  ClientDrawingDataPacket p = (ClientDrawingDataPacket) object;
         	  HashMap<String,Square> squares = Main.game.getSquare();
         	  squares.get(p.getEID()).drawline(p.getX1(), p.getY1(), p.getX2(), p.getY2(), p.getColor());
+        	  byte[] dat = Utilities.convertObjectToBytes(stamps.DRAWINGDATA.val(), p);
+        	  for(Tuple t : Main.game.tuples) {
+					try {
+						InetAddress IP = (InetAddress)t.y;
+						int port = (int) t.z;
+						if(IP.equals(remoteAddress))
+							continue;
+						else
+							Server.outgoingQueue.put(new DatagramPacket(dat,dat.length,IP,port));
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+				}
+        	  
           }else if (stamp == stamps.DRAWFAIL.val()) {
         	  SendStringPacket p = (SendStringPacket) object;
         	  HashMap<String,Square> squares = Main.game.getSquare();
         	  squares.get(p.getString()).clear();
         	  squares.get(p.getString()).setState(Square.STATE_IDLE);
+        	  byte[] dat = Utilities.convertObjectToBytes(stamps.DRAWFAIL.val(), p);
+        	  for(Tuple t : Main.game.tuples) {
+					try {
+						InetAddress IP = (InetAddress)t.y;
+						int port = (int) t.z;
+						if(IP.equals(remoteAddress))
+							continue;
+						else
+							Server.outgoingQueue.put(new DatagramPacket(dat,dat.length,IP,port));
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+				}
         	  
           }else if(stamp == stamps.DRAWCLAIM.val()) {
         	  SendStringPacket p = (SendStringPacket) object;
@@ -131,6 +158,19 @@ public class Listener implements Runnable {
         	  String color = p.getString().split(";")[1];
         	  squares.get(eid).fill(Color.valueOf(color));;
         	  squares.get(eid).setState(Square.STATE_CLAIMED);
+        	  byte[] dat = Utilities.convertObjectToBytes(stamps.DRAWCLAIM.val(), p);
+        	  for(Tuple t : Main.game.tuples) {
+					try {
+						InetAddress IP = (InetAddress)t.y;
+						int port = (int) t.z;
+						if(IP.equals(remoteAddress))
+							continue;
+						else
+							Server.outgoingQueue.put(new DatagramPacket(dat,dat.length,IP,port));
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+				}
           }
 
 
