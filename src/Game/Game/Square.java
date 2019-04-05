@@ -153,6 +153,7 @@ public class Square {
                 	  state = STATE_CLAIMED;
                 	  fill(game.getUsrClr());
                 	  square.setGameState(STATE_CLAIMED);
+                	  game.sendClaimedState(entityID);
 
                 	  
                 	}
@@ -160,6 +161,7 @@ public class Square {
                 	  clear();
                 	  state = STATE_IDLE;
                 	  square.setGameState(STATE_IDLE);
+                	  game.sendDrawFail(entityID);
                   }
                 	Future<Boolean> lockReleaseStatus = square.releaseMutex();
                     try {
