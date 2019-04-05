@@ -341,7 +341,11 @@ public class Game {
 		
 	}
     
+    
+    
     public synchronized void sendDrawFail(String EID) {
+    	
+    
     	if (this.s != null) {
     		
     		SendStringPacket p = new SendStringPacket(EID);
@@ -428,6 +432,49 @@ public class Game {
 	public void Adduser(InetAddress address, int port, String string) {
 		Tuple t = new Tuple<>(string,address,port);
 		tuples.add(t);
+		
+	}
+
+	public void sendBeingFilled(String EID) {
+		if (this.s != null) {
+
+			SendStringPacket p = new SendStringPacket(new Color(usrClr.getRed(),usrClr.getGreen(),usrClr.getBlue(),.5).toString()+"|"+EID);
+			byte stamp = stamps.DRAWING.val();
+			try {
+				byte[] data = convertObjectToBytes(stamp,p);
+				for(Tuple t : tuples) {
+					try {
+						InetAddress IP = (InetAddress)t.y;
+						int port = (int) t.z;
+						Server.outgoingQueue.put(new DatagramPacket(data,data.length,IP,port));
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//todo broadcast this message to every client
+		}else {
+			//todo send message to server
+			SendStringPacket p = new SendStringPacket(new Color(usrClr.getRed(),usrClr.getGreen(),usrClr.getBlue(),.5).toString()+"|"+EID);
+			byte stamp = stamps.DRAWING.val();
+			try {
+				byte[] data = convertObjectToBytes(stamp,p);
+				try {
+					Client.outgoingPackets.put(new DatagramPacket(data,data.length,InetAddress.getByName(Main.serverIP),Main.serverPort));
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 	}
 

@@ -168,6 +168,12 @@ public class Listener implements Runnable {
       			  Main.game.Adduser(inet, port, "");
       		  }
 
+          }else if (stamp == stamps.DRAWING.val()) {
+        	  SendStringPacket p = (SendStringPacket) object;
+        	  HashMap<String,Square> squares = Main.game.getSquare();
+        	  String eid = p.getString().split("\\|")[1];
+        	  String color = p.getString().split("\\|")[0];
+        	  squares.get(eid).fill(Color.valueOf(color));
           }
 
         }

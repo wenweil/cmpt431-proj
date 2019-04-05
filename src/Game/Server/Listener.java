@@ -175,6 +175,25 @@ public class Listener implements Runnable {
 						e.printStackTrace();
 					}
 				}
+          }else if (stamp == stamps.DRAWING.val()) {
+        	  SendStringPacket p = (SendStringPacket) object;
+        	  HashMap<String,Square> squares = Main.game.getSquare();
+        	  String eid = p.getString().split("\\|")[1];
+        	  String color = p.getString().split("\\|")[0];
+        	  squares.get(eid).fill(Color.valueOf(color));
+        	  byte[] dat = Utilities.convertObjectToBytes(stamps.DRAWING.val(), p);
+        	  for(Tuple t : Main.game.tuples) {
+					try {
+						InetAddress IP = (InetAddress)t.y;
+						int port = (int) t.z;
+						if(IP.equals(remoteAddress))
+							continue;
+						else
+							Server.outgoingQueue.put(new DatagramPacket(dat,dat.length,IP,port));
+					}catch(Exception e){
+						e.printStackTrace();
+					}
+			 }
           }
 
 

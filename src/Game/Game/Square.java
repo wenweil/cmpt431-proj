@@ -93,8 +93,9 @@ public class Square {
 
                 if(lock == true) {
                   state = STATE_SELECTED;
+                  game.sendBeingFilled(entityID);
                 }
-
+                
 
                 SquareNetworkHandler.deleteActiveSquare();
 
@@ -119,7 +120,7 @@ public class Square {
 
 				    drawline(prevx-back.getX(),prevy-back.getY(),event.getX()-back.getX(),event.getY()-back.getY(),game.getUsrClr());
 				    
-				    game.sendTwoPointsforDrawLine(prevx-back.getX(),prevy-back.getY(),event.getX()-back.getX(),event.getY()-back.getY(),entityID);
+				    //game.sendTwoPointsforDrawLine(prevx-back.getX(),prevy-back.getY(),event.getX()-back.getX(),event.getY()-back.getY(),entityID);
 				    
 				    prevx = event.getX();
 				    prevy = event.getY();
