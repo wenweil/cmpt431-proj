@@ -458,7 +458,7 @@ public class Game {
 			//todo broadcast this message to every client
 		}else {
 			//todo send message to server
-			SendStringPacket p = new SendStringPacket(new Color(usrClr.getRed(),usrClr.getGreen(),usrClr.getBlue(),.5).toString()+"|"+EID);
+			SendStringPacket p = new SendStringPacket(new Color(usrClr.getRed(),usrClr.getGreen(),usrClr.getBlue(),.2).toString()+"|"+EID);
 			byte stamp = stamps.DRAWING.val();
 			try {
 				byte[] data = convertObjectToBytes(stamp,p);
