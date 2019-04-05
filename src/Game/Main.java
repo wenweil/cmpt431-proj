@@ -53,6 +53,7 @@ public class Main extends Application {
         TextField numbox = new TextField();
         TextField thresh = new TextField();
 
+        //creates the fields and the buttons on the screen for the first screen
 
         brushSizeField.setPromptText("Enter brush size here");
         numbox.setPromptText("Enter number of boxes here");
@@ -65,6 +66,7 @@ public class Main extends Application {
 
         newGame.setOnAction(new EventHandler<ActionEvent>() {
 
+            //sets on clicking the new game button create the server client, the client that also acts as the server
             @Override
             public void handle(ActionEvent event) {
                 numboxint = Integer.parseInt(numbox.getText());
@@ -75,6 +77,8 @@ public class Main extends Application {
                 boardHeight = 10 + 63 * numboxint;
                 boardWidth = 10 + 63 * numboxint;
 
+                //sets all the parameter of the game on startup
+
                 WritableImage image = new WritableImage(10 + 63 * numboxint, 10 + 63 * numboxint);
                 PixelWriter writer = image.getPixelWriter();
 
@@ -83,9 +87,9 @@ public class Main extends Application {
                         writer.setColor(x, y, Color.GRAY);
                     }
                 }
-
+                //create the background
                 root.getChildren().add(new ImageView(image));
-                
+
                 game.serverStart();
 
                 Scene scene = new Scene(root, boardHeight, boardWidth);
@@ -98,6 +102,8 @@ public class Main extends Application {
 
 
         connect.setOnAction(new EventHandler<ActionEvent>() {
+            //set on clicking the connect button, connect to the server client. This does not start the thread associated
+            //with server behaviors
             @Override
             public void handle(ActionEvent event) {
 
@@ -114,6 +120,9 @@ public class Main extends Application {
                 if (!error){
 
                 	Thread th = new Thread(new Connection());
+                	//create the thread to get all information required to create the same game as the server, gets
+                    //board size(number of squares),screen size,threshold, and all the entity IDs associated with the
+                    //squares
                     th.start();
 					try {
 						th.join();
@@ -145,34 +154,12 @@ public class Main extends Application {
                         System.out.println(s);
                         game.addSquare(s,row,col);
                     }
+                    //builds the board and add to current view.
 
                     Scene scene = new Scene(root, boardWidth, boardHeight);
                     primaryStage.setScene(scene);
 
                     primaryStage.show();
-
-                 /*   new Thread(new Connection()).start();
-                    new Thread(new BoardInitialization());
-                    new Thread(new SquareInitalization());
-
-                    WritableImage image = new WritableImage(1600, 900);
-                    PixelWriter writer = image.getPixelWriter();
-
-                    for (int x = 0; x < 1600; x++) {
-                        for (int y = 0; y < 900; y++) {
-                            writer.setColor(x, y, Color.GRAY);
-                        }
-                    }
-
-                    root.getChildren().add(new ImageView(image));
-
-                    game.startOld();
-
-                    Scene scene = new Scene(root, 1600, 900);
-
-                    primaryStage.setScene(scene);
-
-                    primaryStage.centerOnScreen();*/
                 }
             }
         });

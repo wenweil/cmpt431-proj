@@ -72,13 +72,14 @@ public class Game {
 
     public void serverStart(){
     	s = Server.getInstance();
-       
+       //create the singleton server
         
         Thread thread = new Thread(s.getListener());
         Thread thread1 = new Thread(s.getSender());
         thread.start();
         thread1.start();
-        
+        //starts  the listener threads, this maybe better to be moved at the bottom of this method to make sure when
+        //client connects the objects are initialized
         squares = new HashMap<>();
         Square s;
         
@@ -99,11 +100,12 @@ public class Game {
                 this.s.getGameData().getSquareStatus().put(generatedString, SquareStatus.AVAILABLE);
                 this.s.getGameData().getMutexes().put(generatedString, new Mutex());
 
-                squares.put(generatedString, s);
+                squares.put(generatedString, s);//put square into a hashmap so that when a ID is received the reference
+                                                //to corresponding object is obtained
                 root.getChildren().addAll(s.getImage());
             }
         }
-        setupMutex();
+        setupMutex();//unused version of mutex lock, can be removed
         
     }
 
@@ -156,8 +158,7 @@ public class Game {
         if(!root.getChildren().contains(square.getImage())){
             root.getChildren().addAll(square.getImage());
         }
-
-
+        //builds square with received square ID and add to screen
 
     }
 
@@ -240,13 +241,14 @@ public class Game {
     }
     
     public synchronized void sendClaimedState(String EID) {
-    	if (this.s != null) {
-    		//todo broadcast this message to every client
+    	if (this.s != null) {//the behavior of sendClaimedState when the current client is a server
+
     		SendStringPacket p = new SendStringPacket(EID + ";"+ usrClr.toString());
+    		//create the message with entity ID and user color to set the claimed state to a square
     		byte stamp = stamps.DRAWCLAIM.val();
     		try {
 				byte[] data = convertObjectToBytes(stamp,p);
-				for(Tuple t : tuples) {
+				for(Tuple t : tuples) {//broadcast this message to every client
 					try {
 						InetAddress IP = (InetAddress)t.y;
 						int port = (int) t.z;
@@ -261,12 +263,12 @@ public class Game {
 				e.printStackTrace();
 			}
     		
-    	}else {
+    	}else {//the behavior of sendClaimedState when the current client is a client
     		SendStringPacket p = new SendStringPacket(EID + ";"+ usrClr.toString());
     		byte stamp = stamps.DRAWCLAIM.val();
     		try {
 				byte[] data = convertObjectToBytes(stamp,p);
-				try {
+				try {//send the message
 					Client.outgoingPackets.put(new DatagramPacket(data,data.length,InetAddress.getByName(Main.serverIP),Main.serverPort));
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -283,7 +285,10 @@ public class Game {
     }
     
     public synchronized void sendTwoPointsforDrawLine(double x1, double y1, double x2, double y2, String entityID) {
-		if (this.s != null) {
+		if (this.s != null) {//unused feature that allows realtime drawing of all the clients, tells the other client
+		                     //the mouse position of this host so that they can replay the same drawing
+                             //sends only a entityID and 4 doubles. Current implementation allows for 2 clients to work
+                             //perfectly, more clients cause an arrayIndexOutofBound exception
 			ClientDrawingDataPacket p = new ClientDrawingDataPacket();
 			p.setX1(x1);
 			p.setX2(x2);
@@ -295,7 +300,7 @@ public class Game {
 			
 			try {
 				byte[] data = convertObjectToBytes(stamp,p);
-				for(Tuple t : tuples) {
+				for(Tuple t : tuples) {// broadcast this message to every client
 					try {
 						InetAddress IP = (InetAddress)t.y;
 						int port = (int) t.z;
@@ -309,11 +314,9 @@ public class Game {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			
-    		// todo broadcast this message to every client
+
     	}else {
-    		//todo send message to server
+
     		ClientDrawingDataPacket p = new ClientDrawingDataPacket();
 			p.setX1(x1);
 			p.setX2(x2);
@@ -325,7 +328,7 @@ public class Game {
 			
 			try {
 				byte[] data = convertObjectToBytes(stamp,p);
-				try {
+				try {//send message to server
 					Client.outgoingPackets.put(new DatagramPacket(data,data.length,InetAddress.getByName(Main.serverIP),Main.serverPort));
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -353,7 +356,7 @@ public class Game {
     		try {
 				byte[] data = convertObjectToBytes(stamp,p);
 				for(Tuple t : tuples) {
-					try {
+					try {//broadcast this message to every client
 						InetAddress IP = (InetAddress)t.y;
 						int port = (int) t.z;
 						Server.outgoingQueue.put(new DatagramPacket(data,data.length,IP,port));
@@ -365,21 +368,18 @@ public class Game {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-    		//todo broadcast this message to every client
     	}else {
-    		//todo send message to server
+
     		SendStringPacket p = new SendStringPacket(EID);
     		byte stamp = stamps.DRAWFAIL.val();
     		try {
     			byte[] data = convertObjectToBytes(stamp,p);
-				try {
+				try {//send message to server
 					Client.outgoingPackets.put(new DatagramPacket(data,data.length,InetAddress.getByName(Main.serverIP),Main.serverPort));
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
-				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -436,13 +436,14 @@ public class Game {
 	}
 
 	public void sendBeingFilled(String EID) {
-		if (this.s != null) {
+		if (this.s != null) {//current work around for the arrayindexoutofbound problem, sends only one packet to the
+		                     //clients, contains only the entityID and the string representation of the current user color
 
 			SendStringPacket p = new SendStringPacket(new Color(usrClr.getRed(),usrClr.getGreen(),usrClr.getBlue(),.5).toString()+"|"+EID);
 			byte stamp = stamps.DRAWING.val();
 			try {
 				byte[] data = convertObjectToBytes(stamp,p);
-				for(Tuple t : tuples) {
+				for(Tuple t : tuples) {//broadcast this message to every client
 					try {
 						InetAddress IP = (InetAddress)t.y;
 						int port = (int) t.z;
@@ -455,7 +456,7 @@ public class Game {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			//todo broadcast this message to every client
+
 		}else {
 			//todo send message to server
 			SendStringPacket p = new SendStringPacket(new Color(usrClr.getRed(),usrClr.getGreen(),usrClr.getBlue(),.2).toString()+"|"+EID);
