@@ -151,13 +151,14 @@ public class Square {
 
                 	if((count/(sizex*sizey)) >= game.getThreashhold()){
                 	  state = STATE_CLAIMED;
-                    square.setGameState(STATE_CLAIMED);
-
                 	  fill(game.getUsrClr());
+                	  square.setGameState(STATE_CLAIMED);
+
+                	  
                 	}
                 	else{
                 	  state = STATE_IDLE;
-                    square.setGameState(STATE_IDLE);
+                	  square.setGameState(STATE_IDLE);
                   }
                 	Future<Boolean> lockReleaseStatus = square.releaseMutex();
                     try {

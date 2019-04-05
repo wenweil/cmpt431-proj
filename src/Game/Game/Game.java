@@ -5,12 +5,14 @@ import Game.Packets.MutexRequestPacket;
 import Game.Packets.SendStringPacket;
 import Game.Packets.SquareStringRequest;
 import Game.Server.GameData;
+import Game.Server.Mutex;
 import Game.Server.Server;
 import Game.Strategies.stamps;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import Game.Main;
 import Game.Client.Client;
+import Game.Server.SquareStatus;
 
 import static Game.Utilities.Utilities.convertObjectToBytes;
 
@@ -94,6 +96,8 @@ public class Game {
                 s.setEntityID(generatedString);
                 
                 this.s.getGameData().setSqrCodes(i, j, generatedString);
+                this.s.getGameData().getSquareStatus().put(generatedString, SquareStatus.AVAILABLE);
+                this.s.getGameData().getMutexes().put(generatedString, new Mutex());
 
                 squares.put(generatedString, s);
                 root.getChildren().addAll(s.getImage());

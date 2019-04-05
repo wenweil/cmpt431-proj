@@ -25,9 +25,11 @@ public class ServerMutexResponse implements ServerResponseStrategy {
     // find square status in the hashmap;
     HashMap<String, SquareStatus> sqstatus = Server.getInstance().getGameData().getSquareStatus();
     SquareStatus status = sqstatus.get(squareID);
+    System.out.println(status);
 
 
     Mutex mutex = mutexes.get(squareID);
+    
 
     Boolean val;
     if(status==SquareStatus.AVAILABLE){

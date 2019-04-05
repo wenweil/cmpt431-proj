@@ -1,6 +1,6 @@
 package Game.Server;
 
-enum SquareStatus {
+public enum SquareStatus {
 
   AVAILABLE,
   BEING_COLORED,
