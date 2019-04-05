@@ -221,7 +221,7 @@ public class Square {
         this.state = state;
     }
 
-    public void drawline(double x1, double y1, double x2, double y2, Color c){
+    public synchronized void drawline(double x1, double y1, double x2, double y2, Color c){
         double tmp;
         boolean flip = false;
         boolean negate = false;
@@ -283,7 +283,7 @@ public class Square {
     }
 
 
-    public void clear (){
+    public synchronized void clear (){
         for (int x =0 ; x < sizex ; x++){
             for (int y =0 ; y < sizey ; y++) {
                 pixelWriter.setColor(x,y, Color.WHITE);
@@ -294,7 +294,7 @@ public class Square {
 
     }
 
-    public void fill(Color c) {
+    public synchronized void fill(Color c) {
         for (int x = 0; x < sizex; x++) {
             for (int y = 0; y < sizey; y++) {
                 pixelWriter.setColor(x, y, c);

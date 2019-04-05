@@ -65,7 +65,7 @@ public class Client{
     // start listner and sender threads;
     new Thread(new Listener()).start();
     new Thread(new Sender()).start();
-    Timer t = new Timer();
+    /*Timer t = new Timer();
     TimerTask tt = new TimerTask() {
     	@Override
     	public void run() {
@@ -93,7 +93,7 @@ public class Client{
     	}
     };
     
-    t.scheduleAtFixedRate(tt, 0, 2000);
+    t.scheduleAtFixedRate(tt, 0, 2000);*/
 
   }
   
