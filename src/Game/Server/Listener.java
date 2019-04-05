@@ -57,6 +57,25 @@ public class Listener implements Runnable {
       ProcessPacket(DatagramPacket packet){
         this.packet = packet;
       }
+      
+      public synchronized void putDrawingData(InetAddress remoteAddress,Serializable object) throws IOException {
+    	  ClientDrawingDataPacket p = (ClientDrawingDataPacket) object;
+    	  HashMap<String,Square> squares = Main.game.getSquare();
+    	  squares.get(p.getEID()).drawline(p.getX1(), p.getY1(), p.getX2(), p.getY2(), p.getColor());
+    	  byte[] dat = Utilities.convertObjectToBytes(stamps.DRAWINGDATA.val(), p);
+    	  for(Tuple t : Main.game.tuples) {
+				try {
+					InetAddress IP = (InetAddress)t.y;
+					int port = (int) t.z;
+					if(IP.equals(remoteAddress))
+						continue;
+					else
+						Server.outgoingQueue.put(new DatagramPacket(dat,dat.length,IP,port));
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+      }
 
 
       public void run(){
@@ -115,22 +134,7 @@ public class Listener implements Runnable {
               Server.outgoingQueue.put(dp);
             }
           else if (stamp == stamps.DRAWINGDATA.val()) {
-        	  ClientDrawingDataPacket p = (ClientDrawingDataPacket) object;
-        	  HashMap<String,Square> squares = Main.game.getSquare();
-        	  squares.get(p.getEID()).drawline(p.getX1(), p.getY1(), p.getX2(), p.getY2(), p.getColor());
-        	  byte[] dat = Utilities.convertObjectToBytes(stamps.DRAWINGDATA.val(), p);
-        	  for(Tuple t : Main.game.tuples) {
-					try {
-						InetAddress IP = (InetAddress)t.y;
-						int port = (int) t.z;
-						if(IP.equals(remoteAddress))
-							continue;
-						else
-							Server.outgoingQueue.put(new DatagramPacket(dat,dat.length,IP,port));
-					}catch(Exception e){
-						e.printStackTrace();
-					}
-				}
+        	  putDrawingData(remoteAddress,object);
         	  
           }else if (stamp == stamps.DRAWFAIL.val()) {
         	  SendStringPacket p = (SendStringPacket) object;
