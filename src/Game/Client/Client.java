@@ -81,11 +81,11 @@ public class Client{
     			socket.close();   			
     		} catch(Exception e) {
     			counter++;
-    			e.printStackTrace();
-    			System.out.println(counter);
+    			//e.printStackTrace();
+    			//System.out.println(counter);
     			if (counter >= 5) {
     				System.out.println("CANNOT CONNECT TO SERVER");
-    				System.out.println("TEST : " + Main.game.tuples.size());
+    				//System.out.println("TEST : " + Main.game.tuples.size());
     			}
     			
     		}

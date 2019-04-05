@@ -2,11 +2,13 @@ package Game.Client;
 
 import Game.Client.GameStages.Connection;
 import Game.Game.Square;
+import Game.Game.SquareNetworkHandler;
 import Game.Game.Squares;
 import Game.Game.Game.Tuple;
 import Game.Main;
 import Game.Packets.ClientDrawingDataPacket;
 import Game.Packets.ConnectionResponsePacket;
+import Game.Packets.MutexReleaseResponse;
 import Game.Packets.MutexResponsePacket;
 import Game.Packets.SendStringPacket;
 import Game.Packets.SquareStringRequest;
@@ -111,15 +113,32 @@ public class Listener implements Runnable {
             }
           }
           else if (stamp == 6){
-            // mutex request response block
-            MutexResponsePacket mutres = (MutexResponsePacket) object;
-            Boolean lock = mutres.getLock();
+              // mutex request response block
+              MutexResponsePacket mutexResponsePacket = (MutexResponsePacket) object;
 
-            synchronized (reqLock){
-              reqLock = lock;
-              reqLock.notify();
+              Boolean lock = mutexResponsePacket.getLock();
+
+              SquareNetworkHandler.hasLock = lock;
+
+
+              SquareNetworkHandler.message=true;
+              synchronized (SquareNetworkHandler.message){
+                SquareNetworkHandler.message.notify();
+              }
             }
-          }
+            else if (stamp == 8){
+              MutexReleaseResponse mutexReleaseResponse = (MutexReleaseResponse) object;
+
+              Boolean signal = mutexReleaseResponse.getLockStatus();
+
+              SquareNetworkHandler.hasLock = signal;
+
+              SquareNetworkHandler.message=true;
+              synchronized (SquareNetworkHandler.message){
+                SquareNetworkHandler.message.notify();
+              }
+
+            }
           else if (stamp == stamps.DRAWINGDATA.val()) {
         	  ClientDrawingDataPacket p = (ClientDrawingDataPacket) object;
         	  HashMap<String,Square> squares = Main.game.getSquare();
@@ -138,10 +157,12 @@ public class Listener implements Runnable {
         	  squares.get(eid).fill(Color.valueOf(color));
         	  squares.get(eid).setState(Square.STATE_CLAIMED);
           }else if(stamp == stamps.UPDATELISTOFUSER.val()) {
+        	  System.out.println("Test thing:"+Main.game.tuples.size());
         	  SendStringPacket p = (SendStringPacket) object;
-        	  String[] ips = p.getString().split("|");
+        	  String[] ips = p.getString().split("\\|");
       		  Main.game.tuples = new ArrayBlockingQueue<Tuple<String,InetAddress,Integer>>(2048);
       		  for(String ip : ips) {
+      			  System.out.println("Test thing ip:"+ip);
       			  InetAddress inet = InetAddress.getByName(ip.split(":")[0]);
       			  int port = Integer.parseInt(ip.split(":")[1]);
       			  Main.game.Adduser(inet, port, "");

@@ -84,8 +84,10 @@ public class Listener implements Runnable {
             for(Tuple t: Main.game.tuples) {
             	InetAddress x = (InetAddress) t.y;
             	int port = (int) t.z;
-            	s += x.toString() + ":" +port+"|";
+            	s += x.getHostAddress() + ":" +port+"|";
             }
+            
+            System.out.println(s);
             
             SendStringPacket p = new SendStringPacket(s);
             byte st = stamps.UPDATELISTOFUSER.val();
@@ -93,22 +95,25 @@ public class Listener implements Runnable {
             for(Tuple t: Main.game.tuples) {
             	InetAddress x = (InetAddress) t.y;
             	int port = (int) t.z;
-            	Server.outgoingQueue.put(new DatagramPacket(data,data.length,x,port));
+            	System.out.println(x.getHostAddress()+":"+port);
+            	Server.outgoingQueue.put(new DatagramPacket(dat,dat.length,x,port));
             }
             
 
           }
           else if (stamp == 3){
-            DatagramPacket dp = new ServerStringResponse().generateServerResponse(remoteAddress,remotePort,object);
-            Server.outgoingQueue.put(dp);
-          }
-          else if(stamp == stamps.MUTEXUNLOCKREQUEST.val()){
-            DatagramPacket dp = new ServerMutexResponse().generateServerResponse(remoteAddress,remotePort,object);
-            Server.outgoingQueue.put(dp);
-          }
-          else if(stamp == 7){
+              DatagramPacket dp = new ServerStringResponse().generateServerResponse(remoteAddress,remotePort,object);
+              Server.outgoingQueue.put(dp);
+            }
+            else if(stamp == 5){
+              DatagramPacket dp  = new ServerMutexResponse().generateServerResponse(remoteAddress,remotePort,object);
+              Server.outgoingQueue.put(dp);
 
-          }
+            }
+            else if(stamp == 7){
+              DatagramPacket dp = new ServerMutexReleaseResponse().generateServerResponse(remoteAddress,remotePort,object);
+              Server.outgoingQueue.put(dp);
+            }
           else if (stamp == stamps.DRAWINGDATA.val()) {
         	  ClientDrawingDataPacket p = (ClientDrawingDataPacket) object;
         	  HashMap<String,Square> squares = Main.game.getSquare();

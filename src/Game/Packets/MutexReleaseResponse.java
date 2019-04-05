@@ -5,17 +5,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-public class MutexRequestPacket implements Serializable {
+public class MutexReleaseResponse implements Serializable {
 
-  public String getSquareCode() {
-    return squareCode;
+  public MutexReleaseResponse(Boolean signal) {
+    this.lockStatus = signal;
   }
 
-  private String squareCode;
-
-  public MutexRequestPacket(String squareCode){
-    this.squareCode = squareCode;
+  public Boolean getLockStatus() {
+    return lockStatus;
   }
+
+  Boolean lockStatus;
+
 
   private void readObject(ObjectInputStream in)
       throws IOException, ClassNotFoundException {

@@ -17,9 +17,15 @@ public class GameData {
   private int numSqInCol;
 
   private double threshold;
+  
+  public HashMap<String, SquareStatus> getSquareStatus() {
+	    return squareStatus;
+	  }
+
+  private HashMap<String,SquareStatus> squareStatus;
 
   private String[][] squareCodes = new String[10][10];
-  private HashMap<String,Boolean> mutexes;
+  private HashMap<String,Mutex> mutexes;
 
   public int getBrushSize() {
     return brushSize;
@@ -44,6 +50,10 @@ public class GameData {
   public double getThreshold() {
 	  return threshold;
   }
+  
+  public HashMap<String, Mutex> getMutexes() {
+	    return mutexes;
+	  }
 
   public GameData (int brushSize,double threshold,int boardHeight,int boardWidth , int numBox){
     this.brushSize = brushSize;
@@ -53,6 +63,9 @@ public class GameData {
     this.numSqInCol = numBox;
     this.numSqInRow = numBox;
     this.squareCodes = new String[this.numSqInCol][this.numSqInRow];
+    mutexes = new HashMap<>();
+    squareStatus = new HashMap<>();
+    
   }
 
   public GameData(){

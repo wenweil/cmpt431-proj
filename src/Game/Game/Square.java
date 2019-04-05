@@ -10,6 +10,8 @@ import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class Square {
 
@@ -62,20 +64,54 @@ public class Square {
 
     private void init(){
 
-        back.setOnMouseEntered(new EventHandler<MouseEvent>() {
+    	/*back.setOnMouseEntered(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(state == STATE_IDLE) {
-                    state = STATE_SELECTED;
-                }
+//                if(state == STATE_IDLE) {
+//                    state = STATE_SELECTED;
+//                }
                 event.consume();
             }
-        });
+        });*/
 
+        back.setOnMousePressed(new EventHandler<MouseEvent>() {
+          @Override
+          public void handle(MouseEvent event) {
+
+            if(state == STATE_IDLE){
+
+              //Future<Boolean> mutexRequest = Squares.getInstance().requestMutex();
+              try {
+
+                SquareNetworkHandler.getActiveSquare().setCurrentSquareID(entityID);
+
+                Future<Boolean> mutexRequest = SquareNetworkHandler.getActiveSquare().requestMutex();
+
+                Boolean lock = mutexRequest.get();
+
+                System.out.println("lock acquired :" +lock);
+
+                if(lock == true) {
+                  state = STATE_SELECTED;
+                }
+
+
+                SquareNetworkHandler.deleteActiveSquare();
+
+              } catch (InterruptedException|ExecutionException e) {
+                e.printStackTrace(); }
+            }
+            // lock local mutex which prevents mouse from sending updates when moving
+            // request Squar mutex from the server
+            // wait for local mutex to be unlocked.
+
+            event.consume();
+          }
+        });
         back.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if (state == STATE_SELECTED && game.getLock(entityID)){
+                if (state == STATE_SELECTED ){
 				    if(prevx == -1 || prevy == -1) {
 				        prevx = event.getX();
 				        prevy = event.getY();
@@ -97,7 +133,8 @@ public class Square {
         back.setOnMouseReleased(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-            	System.out.println("release print "+entityID);
+            	ActiveSquare square = SquareNetworkHandler.getActiveSquare();
+                square.setCurrentSquareID(entityID);
                 if(state == STATE_EXITED) {
                     state = STATE_IDLE;
                     clear();
@@ -110,22 +147,39 @@ public class Square {
                                 count++;
                         }
                     }
-                    if((count/(sizex*sizey)) >= game.getThreashhold() && game.reqUnlock(entityID)){
-                        state = STATE_CLAIMED;
-                        fill(game.getUsrClr());
-                        game.sendClaimedState(entityID);
+                    square.setCurrentSquareID(entityID);
+
+                	if((count/(sizex*sizey)) >= game.getThreashhold()){
+                	  state = STATE_CLAIMED;
+                    square.setGameState(STATE_CLAIMED);
+
+                	  fill(game.getUsrClr());
+                	}
+                	else{
+                	  state = STATE_IDLE;
+                    square.setGameState(STATE_IDLE);
+                  }
+                	Future<Boolean> lockReleaseStatus = square.releaseMutex();
+                    try {
+                      Boolean release = lockReleaseStatus.get();
+
+                    } catch (InterruptedException e) {
+                      e.printStackTrace();
+                    } catch (ExecutionException e) {
+                      e.printStackTrace();
                     }
-                    else {
-                    	game.sendDrawFail(entityID);
-                    	game.reqUnlock(entityID);
-                        clear();
+
+                    SquareNetworkHandler.deleteActiveSquare();
+                    clear();
+
                     }
-                }
+                   
+                
                 event.consume();
             }
         });
 
-        back.setOnMouseExited(new EventHandler<MouseEvent>() {
+        /*back.setOnMouseExited(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 if(event.isPrimaryButtonDown() && state == STATE_SELECTED) {
@@ -136,7 +190,7 @@ public class Square {
                                 count++;
                         }
                     }
-                    if((count/(sizex*sizey)) >= game.getThreashhold() && game.reqUnlock(entityID)){
+                    if((count/(sizex*sizey)) >= game.getThreashhold() ){
                         state = STATE_CLAIMED;
                         fill(game.getUsrClr());
                         game.sendClaimedState(entityID);
@@ -157,7 +211,7 @@ public class Square {
                 }
                 event.consume();
             }
-        });
+        });*/
     }
 
     public void setState(int state){
