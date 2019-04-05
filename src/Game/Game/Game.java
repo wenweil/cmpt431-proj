@@ -239,7 +239,7 @@ public class Game {
         setupMutex();
     }
     
-    public void sendClaimedState(String EID) {
+    public synchronized void sendClaimedState(String EID) {
     	if (this.s != null) {
     		//todo broadcast this message to every client
     		SendStringPacket p = new SendStringPacket(EID + ";"+ usrClr.toString());
@@ -282,7 +282,7 @@ public class Game {
     	}
     }
     
-    public void sendTwoPointsforDrawLine(double x1, double y1, double x2, double y2, String entityID) {
+    public synchronized void sendTwoPointsforDrawLine(double x1, double y1, double x2, double y2, String entityID) {
 		if (this.s != null) {
 			ClientDrawingDataPacket p = new ClientDrawingDataPacket();
 			p.setX1(x1);
@@ -341,7 +341,7 @@ public class Game {
 		
 	}
     
-    public void sendDrawFail(String EID) {
+    public synchronized void sendDrawFail(String EID) {
     	if (this.s != null) {
     		
     		SendStringPacket p = new SendStringPacket(EID);

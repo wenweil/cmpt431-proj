@@ -302,7 +302,7 @@ public class Square {
         }
     }
 
-    private void drawSphere(int x, int y, Color c,int size){
+    private synchronized void drawSphere(int x, int y, Color c,int size){
         for (int i = -size; i < size; i++){
             for (int j = -size;j < size; j++){
                 if ((x - i) >= 0 && (x-i)< this.sizex){

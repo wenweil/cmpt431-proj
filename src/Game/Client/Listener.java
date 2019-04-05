@@ -142,7 +142,7 @@ public class Listener implements Runnable {
           else if (stamp == stamps.DRAWINGDATA.val()) {
         	  ClientDrawingDataPacket p = (ClientDrawingDataPacket) object;
         	  HashMap<String,Square> squares = Main.game.getSquare();
-        	  squares.get(p.getEID()).drawline(Math.abs(p.getX1()), Math.abs(p.getY1()), Math.abs(p.getX2()), Math.abs(p.getY2()), p.getColor());
+        	  squares.get(p.getEID()).drawline(Math.abs(p.getX1())%50, Math.abs(p.getY1())%50, Math.abs(p.getX2())%50, Math.abs(p.getY2())%50, p.getColor());
           }else if (stamp == stamps.DRAWFAIL.val()) {
         	  SendStringPacket p = (SendStringPacket) object;
         	  HashMap<String,Square> squares = Main.game.getSquare();
