@@ -1,3 +1,6 @@
+package Game.GameOld;
+
+import Game.Packets.ClientDrawingDataPacket;
 import javafx.event.EventHandler;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
@@ -7,6 +10,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 import java.util.Random;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class Square {
 
@@ -24,11 +29,16 @@ public class Square {
     private ImageView back;
     private WritableImage image;
     private double prevx,prevy;
+    private Color userColor;
     private Game game;
 
     private Random rand;
 
     private int state;
+
+    public static BlockingQueue<ClientDrawingDataPacket> outgoingBuffer;
+    public static BlockingQueue<ClientDrawingDataPacket> incomingBuffer; // When to check the incomiing buffer for messages;
+    // this has to be a separate thread that is fired every time mouse is realeased.
 
     public Square(int offsetx, int offsety, int sizex, int sizey, Game game) {
 
@@ -53,6 +63,9 @@ public class Square {
 
         this.rand = new Random();
 
+        outgoingBuffer = new ArrayBlockingQueue<>(2048);
+        incomingBuffer = new ArrayBlockingQueue<>(2048);
+
         clear();
         
         init();
@@ -65,7 +78,6 @@ public class Square {
             @Override
             public void handle(MouseEvent event) {
                 if(state == STATE_IDLE) {
-                    System.out.println(entityID);
                     state = STATE_SELECTED;
                 }
                 event.consume();
@@ -80,7 +92,18 @@ public class Square {
                     	prevx = event.getX();
                     	prevy = event.getY();
                     }
-                    drawline(prevx,prevy,event.getX(),event.getY(),game.getUsrClr());
+
+                    ClientDrawingDataPacket clientDrawingDataPacket = new ClientDrawingDataPacket.PacketBuilder().
+                        addX1(prevx).
+                        addX2(event.getX()).
+                        addY1(prevy).
+                        addY2(event.getY()).
+                        addColor(userColor).
+                        build();
+
+                  outgoingBuffer.add(clientDrawingDataPacket);
+                  System.out.println("added clientDrawingDataPacket to buffer");
+                    //drawline(prevx,prevy,event.getX(),event.getY(),userColor);
                     prevx = event.getX();
                     prevy = event.getY();
                 }
@@ -105,11 +128,26 @@ public class Square {
                     }
                 	if((count/(sizex*sizey)) >= THRESHHOLD){
         				state = STATE_CLAIMED;
-        				fill(game.getUsrClr());
+        				fill(userColor);
         			}
                 	else
                 		clear();
                 }
+
+                while(!incomingBuffer.isEmpty()){
+                  try {
+
+                    ClientDrawingDataPacket p = incomingBuffer.take();
+                    System.out.println("ClientDrawingDataPacket"+p);
+                    //System.out.println(p);
+                    //System.out.println("printing data"+p.getX1()+" "+p.getY1()+" "+p.getX2()+" "+p.getY2());
+                    drawline(p.getX1(),p.getY1(),p.getX2(),p.getY2(),p.getColor());
+                  } catch (InterruptedException e) {
+                    e.printStackTrace();
+                  }
+
+                }
+              System.out.println("Mouse is released");
                 event.consume();
             }
         });
@@ -183,13 +221,13 @@ public class Square {
         while(x1<= x2){
 
         	if(negate && !flip)
-        		drawSphere((int) (-x1-back.getX()), (int) (y1-back.getY()), c,game.getBrushSize());
-        	if(flip && negate)
-        		drawSphere((int) (-y1-back.getX()), (int) (x1-back.getY()), c,game.getBrushSize());
-        	if(flip && !negate)
-        		drawSphere((int) (y1-back.getX()), (int) (x1-back.getY()), c,game.getBrushSize());
-        	if(!flip && !negate)
-        		drawSphere((int) (x1-back.getX()), (int) (y1-back.getY()), c,game.getBrushSize());
+        		pixelWriter.setColor((int) (-x1-back.getX()), (int) (y1-back.getY()), c);
+        	else if(flip && negate)
+        		pixelWriter.setColor((int) (-y1-back.getX()), (int) (x1-back.getY()), c);
+        	else if(flip && !negate)
+        		pixelWriter.setColor((int) (y1-back.getX()), (int) (x1-back.getY()), c);
+        	else
+        		pixelWriter.setColor((int) (x1-back.getX()), (int) (y1-back.getY()), c);
             x1++;
             y1+=m;
         }
@@ -215,19 +253,9 @@ public class Square {
             }
         }
     }
-
-    private void drawSphere(int x, int y, Color c,int size){
-        for (int i = -size; i < size; i++){
-            for (int j = -size;j < size; j++){
-                if ((x - i) >= 0 && (x-i)< this.sizex){
-                    if((y - j) >= 0 && (y-j)< this.sizey){
-                        if( i*i+j*j <= size*size){
-                            pixelWriter.setColor(x-i, y-j, c);
-                        }
-                    }
-                }
-            }
-        }
+    
+    public void setUsrClr(Color userColor) {
+    	this.userColor = userColor;
     }
 
     public ImageView getImage(){
